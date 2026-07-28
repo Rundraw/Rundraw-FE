@@ -38,5 +38,7 @@
         <activity android:name=".SignActivity" android:exported="false" />
         <!-- 홈 화면 -->
         <activity android:name=".HomeActivity" android:exported="false" />
+        <!-- 랭킹 화면 -->
+        <activity android:name=".RankingActivity" android:exported="false" />
     </application>
 </manifest>

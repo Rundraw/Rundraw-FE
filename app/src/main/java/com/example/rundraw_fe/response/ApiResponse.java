@@ -1,4 +1,4 @@
-package com.example.rundraw_fe.api;
+package com.example.rundraw_fe.response;
 
 public class ApiResponse<T> {
     private boolean isSuccess;

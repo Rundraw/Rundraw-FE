@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.rundraw_fe.api.ApiResponse;
+import com.example.rundraw_fe.response.ApiResponse;
 import com.example.rundraw_fe.api.MemberApi;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.request.NicknameRequest;
