@@ -26,48 +26,37 @@
 
 
         <TextView
-            android:id="@+id/beginnerLevel"
+            android:id="@+id/advancedBtn"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_weight="1"
-
             android:gravity="center"
-
             android:text="상급"
             android:textSize="14sp"
-
             android:background="@drawable/level_unselected"/>
 
 
         <TextView
-            android:id="@+id/middleLevel"
+            android:id="@+id/intermediateBtn"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_weight="1"
-
             android:gravity="center"
-
             android:text="중급"
             android:textSize="14sp"
-
             android:background="@drawable/level_unselected"/>
 
 
         <TextView
-            android:id="@+id/highLevel"
+            android:id="@+id/beginnerBtn"
             android:layout_width="0dp"
             android:layout_height="28dp"
             android:layout_weight="1"
-
             android:gravity="center"
-
             android:text="하급"
             android:textSize="14sp"
-
-            android:textColor="@android:color/white"
-
-            android:background="@drawable/level_selected"/>
-
+            android:textColor="@android:color/black"
+            android:background="@drawable/level_unselected"/>
 
     </LinearLayout>
 

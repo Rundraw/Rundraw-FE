@@ -30,10 +30,6 @@
 
 
     <!-- 코스 이름 -->
-
-
-    <!-- 체험수 -->
-
     <TextView
         android:id="@+id/courseName"
         android:layout_width="wrap_content"
@@ -48,6 +44,7 @@
         app:layout_constraintStart_toEndOf="@+id/rankNumber"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- 체험수 -->
     <TextView
         android:id="@+id/count"
         android:layout_width="wrap_content"
