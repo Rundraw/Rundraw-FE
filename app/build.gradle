@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.androidApplication)
 }
 
-Properties properties = new Properties()
+def Properties properties = new Properties()
 properties.load(project.rootProject.file("local.properties").newDataInputStream())
 
 android {
@@ -29,8 +29,9 @@ android {
         buildConfigField "String", "LOCAL_URL", "\"${properties.getProperty("LOCAL_URL")}\""
 
         // local.properties에서 MAPS_API_KEY를 읽어와 AndroidManifest에서 쓸 수 있게 manifestPlaceholders로 등록
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        manifestPlaceholders = [MAPS_API_KEY: properties.getProperty('MAPS_API_KEY')]
+        manifestPlaceholders = [MAPS_API_KEY: properties.getProperty('MAPS_API_KEY') ?: ""]
+        // 진단용 로그 (Sync 시 Build Output 창에 출력됨)
+        println "=== MAPS_API_KEY CHECK: ${properties.getProperty('MAPS_API_KEY')} ==="
     }
 
     buildTypes {
