@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -13,45 +13,32 @@
         android:roundIcon="@drawable/ic_rundraw_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.RundrawFE"
-        tools:targetApi="31">
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}" />
-
-        <!-- 로그인 성공 후 앱으로 돌아오는 Activity -->
-        <activity
-            android:name=".HomeActivity"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:scheme="rundraw"
-                    android:host="login"/>
-            </intent-filter>
-
-        </activity>
+        tools:targetApi="31"
+        android:usesCleartextTraffic="true">
 
         <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
+            <!-- OAuth Redirect -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="rundraw" android:host="login"/>
+            </intent-filter>
         </activity>
 
-        <!-- 코스 그리기 Activity -->
-        <activity android:name=".DrawCourseActivity" android:exported="false" />
+        <!-- 회원가입 화면 -->
+        <activity android:name=".SignActivity" android:exported="false" />
+        <!-- 홈 화면 -->
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <!-- 랭킹 화면 -->
+        <activity android:name=".RankingActivity" android:exported="false" />
     </application>
-
 </manifest>
