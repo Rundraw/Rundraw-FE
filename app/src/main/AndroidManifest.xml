@@ -42,5 +42,7 @@
         <activity android:name=".HomeActivity" android:exported="false" />
         <!-- 랭킹 화면 -->
         <activity android:name=".RankingActivity" android:exported="false" />
+        <!-- 코스 그리기 화면 -->
+        <activity android:name=".DrawCourseActivity" android:exported="false"/>
     </application>
 </manifest>
