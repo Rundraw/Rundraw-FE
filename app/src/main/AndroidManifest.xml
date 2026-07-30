@@ -21,7 +21,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${GOOGLE_MAP_KEY}"/>
+            android:value="${MAPS_API_KEY}"/>
 
         <!-- 앱 시작 Activity -->
         <activity
@@ -47,6 +47,9 @@
         <activity android:name=".HomeActivity" android:exported="false" />
         <!-- 랭킹 화면 -->
         <activity android:name=".RankingActivity" android:exported="false" />
+        <!-- Gps Art 화면 -->
         <activity android:name=".GpsArtActivity" android:exported="false" />
+        <!-- 코스 상세 화면 -->
+        <activity android:name=".CourseDetailActivity" android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>

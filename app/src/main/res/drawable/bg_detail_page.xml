@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="417dp"
+    android:height="918dp"
+    android:viewportWidth="417"
+    android:viewportHeight="918">
+
+    <!-- 흰색 배경 -->
+    <path
+        android:pathData="M0,0H417V918H0V0Z"
+        android:fillColor="#FFFFFF"/>
+
+
+    <!-- 기존 그라데이션 -->
+    <group>
+
+        <clip-path
+            android:pathData="M0 0H417V918H0V0Z"/>
+
+        <group
+            android:translateX="1"
+            android:translateY="150"
+            android:pivotX="208.5"
+            android:pivotY="459"
+            android:scaleX="2"
+            android:scaleY="2"
+            android:rotation="90">
+
+            <path
+                android:pathData="M0 0V918H417V0">
+
+                <aapt:attr name="android:fillColor">
+
+                    <gradient
+                        android:type="linear"
+                        android:startX="80"
+                        android:startY="459"
+                        android:endX="340"
+                        android:endY="459">
+
+                        <item
+                            android:color="#00FFFFFF"
+                            android:offset="0"/>
+
+                        <item
+                            android:color="#3370A3E2"
+                            android:offset="0.35"/>
+
+                        <item
+                            android:color="#3370A3E2"
+                            android:offset="0.65"/>
+
+                        <item
+                            android:color="#00FFFFFF"
+                            android:offset="1"/>
+
+                    </gradient>
+
+                </aapt:attr>
+
+            </path>
+
+        </group>
+
+    </group>
+
+</vector>
