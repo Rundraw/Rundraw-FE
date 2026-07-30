@@ -1,5 +1,6 @@
 package com.example.rundraw_fe.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.NonNull;
@@ -8,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
+
+import com.example.rundraw_fe.CourseDetailActivity;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.adapter.RankingAdapter;
 import com.example.rundraw_fe.api.RankingApi;
@@ -39,7 +42,24 @@ public class RankingFragment extends Fragment {
                         requireContext()
                 )
         );
-        adapter = new RankingAdapter();
+        adapter = new RankingAdapter(
+                courseId -> {
+
+                    Intent intent = new Intent(
+                            requireContext(),
+                            CourseDetailActivity.class
+                    );
+
+                    intent.putExtra(
+                            "courseId",
+                            courseId
+                    );
+
+                    startActivity(intent);
+
+                },
+                true
+        );
         recyclerView.setAdapter(adapter);
         rankingApi = RetrofitClient.getInstance(requireContext()).create(RankingApi.class);
         getRanking();

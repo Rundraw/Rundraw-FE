@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.RundrawFE" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#4084D8</item>
+        <item name="colorSecondary">#4084D8</item>
     </style>
 
     <style name="Theme.RundrawFE" parent="Base.Theme.RundrawFE" />

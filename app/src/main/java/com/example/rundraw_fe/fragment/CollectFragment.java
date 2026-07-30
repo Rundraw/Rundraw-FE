@@ -1,5 +1,6 @@
 package com.example.rundraw_fe.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rundraw_fe.CourseDetailActivity;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.adapter.RankingAdapter;
 import com.example.rundraw_fe.api.RankingApi;
@@ -43,7 +45,24 @@ public class CollectFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.collectRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new RankingAdapter();
+        adapter = new RankingAdapter(
+                courseId -> {
+
+                    Intent intent = new Intent(
+                            requireContext(),
+                            CourseDetailActivity.class
+                    );
+
+                    intent.putExtra(
+                            "courseId",
+                            courseId
+                    );
+
+                    startActivity(intent);
+
+                },
+                false
+        );
         recyclerView.setAdapter(adapter);
         beginnerBtn = view.findViewById(R.id.beginnerBtn);
         intermediateBtn = view.findViewById(R.id.intermediateBtn);

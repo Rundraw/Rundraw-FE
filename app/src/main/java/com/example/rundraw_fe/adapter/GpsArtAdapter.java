@@ -31,6 +31,7 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
         this.items = items;
         notifyDataSetChanged();
     }
+    private OnItemClickListener listener;
 
     @NonNull
     @Override
@@ -48,18 +49,56 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
             @NonNull ViewHolder holder,
             int position
     ){
-        GpsArtResponse gpsArt = items.get(position);
-        holder.name.setText(gpsArt.getName());
-        holder.likeCount.setText(String.valueOf(gpsArt.getLikeCount()));
 
-        // MapView 초기화
+        GpsArtResponse gpsArt = items.get(position);
+
+
+        holder.name.setText(
+                gpsArt.getName()
+        );
+
+
+        holder.likeCount.setText(
+                String.valueOf(
+                        gpsArt.getLikeCount()
+                )
+        );
+
+
+
+        holder.itemView.setOnClickListener(v -> {
+
+            if(listener != null){
+
+                Log.d(
+                        "COURSE_ID",
+                        "클릭한 courseId : " + gpsArt.getId()
+                );
+
+                listener.onClick(
+                        gpsArt.getId()
+                );
+
+            }
+
+        });
+
+
         holder.mapView.onCreate(null);
+
         holder.mapView.getMapAsync(
                 googleMap -> {
+
                     googleMap.clear();
-                    drawRoute(googleMap, gpsArt);
+
+                    drawRoute(
+                            googleMap,
+                            gpsArt
+                    );
+
                 }
         );
+
     }
 
     private void drawRoute(
@@ -118,7 +157,15 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
             mapView = itemView.findViewById(R.id.gpsArtMap);
         }
     }
-    public GpsArtAdapter(Context context){
+    public GpsArtAdapter(
+            Context context,
+            OnItemClickListener listener
+    ){
         this.context = context;
+        this.listener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onClick(Long courseId);
     }
 }

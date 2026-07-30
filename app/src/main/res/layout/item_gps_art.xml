@@ -22,7 +22,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="15sp"
+                android:textSize="20sp"
                 android:textStyle="bold"/>
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@drawable/ic_heart" />
+                    android:src="@drawable/ic_heart_blue" />
                 <TextView
                     android:id="@+id/likeCount"
                     android:layout_width="wrap_content"
