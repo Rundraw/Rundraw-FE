@@ -6,7 +6,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+
+import com.example.rundraw_fe.fragment.CollectFragment;
+import com.example.rundraw_fe.fragment.RankingFragment;
 
 public class RankingActivity extends AppCompatActivity {
 
