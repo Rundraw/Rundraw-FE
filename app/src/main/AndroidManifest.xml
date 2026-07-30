@@ -17,7 +17,9 @@
         android:theme="@style/Theme.RundrawFE"
         tools:targetApi="31"
         android:usesCleartextTraffic="true">
-
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${GOOGLE_MAP_KEY}" />
         <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
@@ -42,5 +44,7 @@
         <activity android:name=".HomeActivity" android:exported="false" />
         <!-- 랭킹 화면 -->
         <activity android:name=".RankingActivity" android:exported="false" />
+        <!-- 맛집 화면 -->
+        <activity android:name=".RestaurantActivity" android:exported="false" />
     </application>
 </manifest>
