@@ -1,8 +1,8 @@
 package com.example.rundraw_fe.api;
 
 import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.PaginationResponse;
 import com.example.rundraw_fe.response.RankingResponse;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -22,5 +22,13 @@ public interface RankingApi {
             @Query("level") String level,
             @Query("pageSize") Integer pageSize,
             @Query("cursor") String cursor
+    );
+
+    @GET("/api/ranking/art")
+    Call<ApiResponse<PaginationResponse>> getGpsArt(
+            @Query("pageSize")
+            int pageSize,
+            @Query("cursor")
+            String cursor
     );
 }

@@ -1,4 +1,4 @@
-package com.example.rundraw_fe;
+package com.example.rundraw_fe.fragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.rundraw_fe.R;
+import com.example.rundraw_fe.adapter.RankingAdapter;
 import com.example.rundraw_fe.api.RankingApi;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.response.ApiResponse;
