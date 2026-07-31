@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.rundraw_fe.network.ApiClient;
+import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.network.course.CourseApiService;
 import com.example.rundraw_fe.network.course.CreateDraftRequest;
 import com.example.rundraw_fe.network.course.DraftDetailResponse;
@@ -81,7 +81,7 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
             Long tempMemberId = 1L; // 인증 붙기 전 임시값
             CreateDraftRequest request = new CreateDraftRequest(courseName, tempMemberId, pointDTOS);
 
-            CourseApiService api = ApiClient.getClient().create(CourseApiService.class);
+            CourseApiService api = RetrofitClient.getInstance(this).create(CourseApiService.class);
             api.saveDraft(request).enqueue(new Callback<DraftDetailResponse>() {
                 @Override
                 public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
