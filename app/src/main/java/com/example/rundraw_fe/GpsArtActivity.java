@@ -18,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GpsArtActivity extends AppCompatActivity {
+public class GpsArtActivity extends BaseActivity {
     private RecyclerView recyclerView;
     private GpsArtAdapter adapter;
     private RankingApi gpsArtApi;
