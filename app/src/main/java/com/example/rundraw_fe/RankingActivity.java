@@ -6,9 +6,12 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
-public class RankingActivity extends AppCompatActivity {
+import com.example.rundraw_fe.fragment.CollectFragment;
+import com.example.rundraw_fe.fragment.RankingFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+public class RankingActivity extends BaseActivity {
 
 
     private TextView rankingTab;
@@ -24,7 +27,9 @@ public class RankingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ranking);
+        setContentLayout(R.layout.activity_ranking);
+
+        setupBottomNavigation(R.id.navigation_rank);
 
 
         rankingTab =

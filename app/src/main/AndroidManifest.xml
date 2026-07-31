@@ -3,10 +3,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Google Maps API Key 추가 -->
-    <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value= "${MAPS_API_KEY}" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -51,5 +47,9 @@
         <activity android:name=".RankingActivity" android:exported="false" />
         <!-- 코스 그리기 화면 -->
         <activity android:name=".DrawCourseActivity" android:exported="false"/>
+        <!-- Gps Art 화면 -->
+        <activity android:name=".GpsArtActivity" android:exported="false" />
+        <!-- 코스 상세 화면 -->
+        <activity android:name=".CourseDetailActivity" android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>
