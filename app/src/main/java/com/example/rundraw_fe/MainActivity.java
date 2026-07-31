@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             // 기존 회원
             Intent intent = new Intent(
                     MainActivity.this,
-                    RankingActivity.class);
+                    HomeActivity.class);
             startActivity(intent);
         }
         finish();
