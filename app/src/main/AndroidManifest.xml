@@ -17,13 +17,10 @@
         android:theme="@style/Theme.RundrawFE"
         tools:targetApi="31"
         android:usesCleartextTraffic="true">
-
-        <!-- Google Maps API Key 추가 -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value= "${MAPS_API_KEY}" />
-
-        <!-- 메인 화면 -->
+            android:value="${GOOGLE_MAP_KEY}" />
+        <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
@@ -67,14 +64,14 @@
             </intent-filter>
         </activity>
 
-        <!-- 러닝 화면 -->
-        <activity
-            android:name=".RunningActivity"
-            android:exported="false" />
-
-        <!-- 기록 상세 화면 -->
-        <activity android:name=".RecordDetailActivity" android:exported="false" />
-
+        <!-- 회원가입 화면 -->
+        <activity android:name=".SignActivity" android:exported="false" />
+        <!-- 홈 화면 -->
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <!-- 랭킹 화면 -->
+        <activity android:name=".RankingActivity" android:exported="false" />
+        <!-- 맛집 화면 -->
+        <activity android:name=".RestaurantActivity" android:exported="false" />
     </application>
 
 </manifest>
