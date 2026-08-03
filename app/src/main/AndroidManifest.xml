@@ -23,7 +23,12 @@
         <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <!-- 회원가입 화면 -->
         <activity
@@ -57,19 +62,9 @@
         <!-- 네비게이션 준비 화면 (앱 시작 첫 화면으로 지정) -->
         <activity
             android:name=".NavigateActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
 
-        <!-- 회원가입 화면 -->
-        <activity android:name=".SignActivity" android:exported="false" />
-        <!-- 홈 화면 -->
-        <activity android:name=".HomeActivity" android:exported="false" />
-        <!-- 랭킹 화면 -->
-        <activity android:name=".RankingActivity" android:exported="false" />
         <!-- 맛집 화면 -->
         <activity android:name=".RestaurantActivity" android:exported="false" />
     </application>
