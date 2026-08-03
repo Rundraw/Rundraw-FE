@@ -1,5 +1,6 @@
 package com.example.rundraw_fe.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,11 +9,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.rundraw_fe.CourseDetailActivity;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.adapter.GpsArtAdapter;
 import com.example.rundraw_fe.api.RankingApi;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.GpsArtResponse;
 import com.example.rundraw_fe.response.PaginationResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +45,29 @@ public class GpsArtFragment extends Fragment {
                 )
         );
 
-        adapter = new GpsArtAdapter(requireContext());
+        adapter = new GpsArtAdapter(
+                requireContext(),
+                courseId -> {
+
+
+                    Intent intent =
+                            new Intent(
+                                    requireContext(),
+                                    CourseDetailActivity.class
+                            );
+
+
+                    intent.putExtra(
+                            "courseId",
+                            courseId
+                    );
+
+
+                    startActivity(intent);
+
+
+                }
+        );
         recyclerView.setAdapter(adapter);
 
         api = RetrofitClient.getInstance(requireContext()).create(RankingApi.class);
@@ -49,29 +75,51 @@ public class GpsArtFragment extends Fragment {
     }
 
     private void loadGpsArt(){
-        api.getGpsArt(10, "-1")
-                .enqueue(new Callback<ApiResponse<PaginationResponse>>() {
-                    @Override
-                    public void onResponse(
-                            Call<ApiResponse<PaginationResponse>> call,
-                            Response<ApiResponse<PaginationResponse>> response
-                    ){
-                        if(response.isSuccessful() && response.body()!=null){
-                            adapter.setItems(
-                                    response.body()
-                                            .getResult()
-                                            .getData()
-                            );
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(
-                            Call<ApiResponse<PaginationResponse>> call,
-                            Throwable t
-                    ){
-                        Log.e("GPS_ART", "실패", t);
-                    }
-                });
+        api.getGpsArt(10, "-1")
+                .enqueue(
+                        new Callback<ApiResponse<PaginationResponse<GpsArtResponse>>>() {
+
+
+                            @Override
+                            public void onResponse(
+                                    Call<ApiResponse<PaginationResponse<GpsArtResponse>>> call,
+                                    Response<ApiResponse<PaginationResponse<GpsArtResponse>>> response
+                            ){
+
+                                if(response.isSuccessful()
+                                        && response.body()!=null){
+
+
+                                    adapter.setItems(
+                                            response.body()
+                                                    .getResult()
+                                                    .getData()
+                                    );
+
+
+                                }
+
+                            }
+
+
+
+                            @Override
+                            public void onFailure(
+                                    Call<ApiResponse<PaginationResponse<GpsArtResponse>>> call,
+                                    Throwable t
+                            ){
+
+                                Log.e(
+                                        "GPS_ART",
+                                        "실패",
+                                        t
+                                );
+
+                            }
+
+
+                        }
+                );
     }
 }

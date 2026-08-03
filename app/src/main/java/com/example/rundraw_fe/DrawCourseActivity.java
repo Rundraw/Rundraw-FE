@@ -6,12 +6,18 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.rundraw_fe.auth.RetrofitClient;
+import com.example.rundraw_fe.network.course.CourseApiService;
+import com.example.rundraw_fe.network.course.CreateDraftRequest;
+import com.example.rundraw_fe.network.course.DraftDetailResponse;
+import com.example.rundraw_fe.network.course.PointDTO;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +31,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -55,7 +65,39 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
         mapFragment.getMapAsync(this); // 지도가 준비되면 onMapReady 호출됨
 
         saveButton.setOnClickListener(v -> {
-            // 다음 단계(서버 저장 API 연동)에서 채울 부분
+            String courseName = courseNameInput.getText().toString();
+
+            if (courseName.isEmpty() || waypoints.size() < 3) {
+                android.widget.Toast.makeText(this, "코스 이름과 3개 이상의 좌표가 필요합니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            List<PointDTO> pointDTOS = new ArrayList<>();
+            for (int i = 0; i < waypoints.size(); i++) {
+                LatLng p = waypoints.get(i);
+                pointDTOS.add(new PointDTO(i + 1, p.latitude, p.longitude));
+            }
+
+            Long tempMemberId = 1L; // 인증 붙기 전 임시값
+            CreateDraftRequest request = new CreateDraftRequest(courseName, tempMemberId, pointDTOS);
+
+            CourseApiService api = RetrofitClient.getInstance(this).create(CourseApiService.class);
+            api.saveDraft(request).enqueue(new Callback<DraftDetailResponse>() {
+                @Override
+                public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
+                    if (response.isSuccessful()) {
+                        android.widget.Toast.makeText(DrawCourseActivity.this, "코스 저장 완료!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        android.widget.Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<DraftDetailResponse> call, Throwable t) {
+                    android.widget.Toast.makeText(DrawCourseActivity.this, "네트워크 오류: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

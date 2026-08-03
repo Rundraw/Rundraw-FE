@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    tools:context=".RecordDetailActivity">
+
+    <!-- 메인 스크롤 콘텐츠 영역 (상단 타이틀, 지도, 통계 카드) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingBottom="24dp">
+
+            <!-- 상단 타이틀 영역 (RunDraw 로고 및 코스 이름) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="24dp"
+                android:paddingBottom="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RunDraw"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#2196F3"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="초상화 코스"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- 지도 영역 (카드 형태 둥근 모서리) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="330dp"
+                android:layout_height="280dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp">
+
+                <fragment
+                    android:id="@+id/mapDetail"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- 기록 통계 그리드 박스 -->
+            <GridLayout
+                android:layout_width="330dp"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false">
+
+                <!-- 거리 -->
+                <LinearLayout
+                    android:layout_width="155dp"
+                    android:layout_height="80dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="#66BB6A"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="거리"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvDetailDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4.36 km"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <!-- 러닝 시간 -->
+                <LinearLayout
+                    android:layout_width="155dp"
+                    android:layout_height="80dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="#66BB6A"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="러닝 시간"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvDetailTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="03:41"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <!-- 평균 페이스 -->
+                <LinearLayout
+                    android:layout_width="155dp"
+                    android:layout_height="80dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="#66BB6A"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="평균 페이스"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvDetailAvgPace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="07’59”"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+                <!-- 최고 페이스 -->
+                <LinearLayout
+                    android:layout_width="155dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="#66BB6A"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="최고 페이스"
+                        android:textSize="11sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvDetailBestPace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="05’59”"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+
+            </GridLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

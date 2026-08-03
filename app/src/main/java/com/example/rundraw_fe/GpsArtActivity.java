@@ -18,7 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class GpsArtActivity extends AppCompatActivity {
+public class GpsArtActivity extends BaseActivity {
     private RecyclerView recyclerView;
     private GpsArtAdapter adapter;
     private RankingApi gpsArtApi;
@@ -33,7 +33,22 @@ public class GpsArtActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(
                 new LinearLayoutManager(this)
         );
-        adapter = new GpsArtAdapter(this);
+        adapter = new GpsArtAdapter(
+                this,
+                courseId -> {
+                    Intent intent =
+                            new Intent(
+                                    GpsArtActivity.this,
+                                    CourseDetailActivity.class
+                            );
+
+                    intent.putExtra(
+                            "courseId",
+                            courseId
+                    );
+                    startActivity(intent);
+                }
+        );
         recyclerView.setAdapter(adapter);
         gpsArtApi = RetrofitClient.getInstance(this).create(RankingApi.class);
 
@@ -48,28 +63,53 @@ public class GpsArtActivity extends AppCompatActivity {
     }
 
     private void loadGpsArt(){
+
         gpsArtApi.getGpsArt(10, "-1")
                 .enqueue(
-                        new Callback<ApiResponse<PaginationResponse>>() {
+                        new Callback<ApiResponse<PaginationResponse<GpsArtResponse>>>() {
+
                             @Override
                             public void onResponse(
-                                    Call<ApiResponse<PaginationResponse>> call,
-                                    Response<ApiResponse<PaginationResponse>> response
+                                    Call<ApiResponse<PaginationResponse<GpsArtResponse>>> call,
+                                    Response<ApiResponse<PaginationResponse<GpsArtResponse>>> response
                             ) {
-                                Log.d("GPS_ART", "응답 코드 : " + response.code());
-                                if(response.isSuccessful() && response.body()!=null){
-                                    PaginationResponse result = response.body().getResult();
-                                    List<GpsArtResponse> list = result.getData();
-                                    Log.d("GPS_ART", "데이터 개수 : " + list.size());
+
+                                Log.d(
+                                        "GPS_ART",
+                                        "응답 코드 : " + response.code()
+                                );
+
+                                if(response.isSuccessful()
+                                        && response.body()!=null){
+
+                                    PaginationResponse<GpsArtResponse> result =
+                                            response.body()
+                                                    .getResult();
+
+                                    List<GpsArtResponse> list =
+                                            result.getData();
+
+                                    Log.d(
+                                            "GPS_ART",
+                                            "데이터 개수 : " + list.size()
+                                    );
+
                                     adapter.setItems(list);
                                 }
                             }
+
+
                             @Override
                             public void onFailure(
-                                    Call<ApiResponse<PaginationResponse>> call,
+                                    Call<ApiResponse<PaginationResponse<GpsArtResponse>>> call,
                                     Throwable t
                             ){
-                                Log.e("GPS_ART", "조회 실패", t);
+
+                                Log.e(
+                                        "GPS_ART",
+                                        "조회 실패",
+                                        t
+                                );
                             }
                         }
                 );
