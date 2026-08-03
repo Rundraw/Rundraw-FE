@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinAndroid)
 }
 
 Properties properties = new Properties()
@@ -43,11 +44,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
 
     implementation libs.appcompat
+    implementation libs.core.ktx
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
@@ -61,7 +66,4 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-maps:19.0.0'
     implementation 'com.google.android.gms:play-services-location:21.3.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
-    implementation "com.google.android.material:material:1.12.0"
 }

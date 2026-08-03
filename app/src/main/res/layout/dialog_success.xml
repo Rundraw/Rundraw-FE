@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/rounded_box"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- 러닝 아이콘 이미지 적용 -->
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_run" />
+
+    <!-- SUCCESS 텍스트 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="SUCCESS"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- 지금 등록하기 버튼 -->
+    <Button
+        android:id="@+id/btnRegisterNow"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#FFFFFF"
+        android:elevation="2dp"
+        android:text="지금 등록하기"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- 나중에 등록하기 버튼 -->
+    <Button
+        android:id="@+id/btnRegisterLater"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:backgroundTint="#F0F0F0"
+        android:elevation="2dp"
+        android:text="나중에 등록하기"
+        android:textColor="#555555"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
