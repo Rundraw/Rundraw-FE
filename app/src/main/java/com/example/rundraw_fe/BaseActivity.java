@@ -58,16 +58,16 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
 
             if (id == R.id.navigation_route) {
-                if (!(this instanceof HomeActivity)) {
-                    startActivity(new Intent(this, HomeActivity.class));
+                if (!(this instanceof DrawCourseActivity)) {
+                    startActivity(new Intent(this, DrawCourseActivity.class));
                     finish();
                 }
                 return true;
             }
 
             if (id == R.id.navigation_my) {
-                if (!(this instanceof HomeActivity)) {
-                    startActivity(new Intent(this, HomeActivity.class));
+                if (!(this instanceof GpsArtActivity)) {
+                    startActivity(new Intent(this, GpsArtActivity.class));
                     finish();
                 }
                 return true;

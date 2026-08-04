@@ -19,7 +19,7 @@
         android:usesCleartextTraffic="true">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${GOOGLE_MAP_KEY}" />
+            android:value="${MAPS_API_KEY}" />
         <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"

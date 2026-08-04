@@ -36,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class DrawCourseActivity extends BaseActivity implements OnMapReadyCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
@@ -57,6 +57,7 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
         distanceText = findViewById(R.id.distanceText);
         Button saveButton = findViewById(R.id.saveButton);
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
+        setupBottomNavigation(R.id.navigation_route);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
