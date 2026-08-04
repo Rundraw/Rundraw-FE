@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <!-- 프로필 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="24dp">
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_profile_circle"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:id="@+id/tvNickname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="로그아웃"
+            android:textColor="#888888"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- 메뉴 버튼들 -->
+    <TextView
+        android:id="@+id/btnMyComments"
+        style="@style/MyPageMenuButton"
+        android:text="내가 쓴 댓글" />
+
+    <TextView
+        android:id="@+id/btnMyScrap"
+        style="@style/MyPageMenuButton"
+        android:text="스크랩한 코스" />
+
+    <TextView
+        android:id="@+id/btnMyCourses"
+        style="@style/MyPageMenuButton"
+        android:text="코스 모아보기" />
+
+    <TextView
+        android:id="@+id/btnMyDrawn"
+        style="@style/MyPageMenuButton"
+        android:text="내가 그린 코스" />
+
+</LinearLayout>
