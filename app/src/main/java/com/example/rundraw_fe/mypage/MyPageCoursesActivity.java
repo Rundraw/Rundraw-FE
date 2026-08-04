@@ -10,16 +10,30 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rundraw_fe.R;
+import com.example.rundraw_fe.api.MypageApiService;
+import com.example.rundraw_fe.auth.RetrofitClient;
+import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.CourseRecordListResponse;
+import com.example.rundraw_fe.response.CourseRecordResponse;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import android.content.Intent;
+import com.example.rundraw_fe.HomeActivity;
+import com.example.rundraw_fe.RankingActivity;
+import com.example.rundraw_fe.DrawCourseActivity;
+
 public class MyPageCoursesActivity extends AppCompatActivity {
 
     private RecyclerView rvCourses;
     private MyPageCourseAdapter adapter;
-    private final List<String> courseList = new ArrayList<>();
+    private final List<CourseRecordResponse> courseList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,11 +62,26 @@ public class MyPageCoursesActivity extends AppCompatActivity {
         setupBottomNavigation();
     }
 
-    // TODO: MypageService API 연동 - GET /mypage/courses?type=completed|attempted
     private void loadCourses(boolean isCompleted) {
-        courseList.clear();
-        // courseList.addAll(response.getCourses());
-        adapter.notifyDataSetChanged();
+        MypageApiService apiService = RetrofitClient.getInstance(this)
+                .create(MypageApiService.class);
+
+        String type = isCompleted ? "completed" : "attempted";
+
+        apiService.getCourses(type).enqueue(new Callback<ApiResponse<CourseRecordListResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<CourseRecordListResponse>> call,
+                                   Response<ApiResponse<CourseRecordListResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    courseList.clear();
+                    courseList.addAll(response.body().getResult().getCourseRecords());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<CourseRecordListResponse>> call, Throwable t) {}
+        });
     }
 
     private void setupBottomNavigation() {
@@ -61,9 +90,21 @@ public class MyPageCoursesActivity extends AppCompatActivity {
         LinearLayout navCourseSetting = findViewById(R.id.navCourseSetting);
         LinearLayout navMyPage = findViewById(R.id.navMyPage);
 
-        navRanking.setOnClickListener(v -> { /* TODO */ });
-        navHome.setOnClickListener(v -> { /* TODO */ });
-        navCourseSetting.setOnClickListener(v -> { /* TODO */ });
+        navRanking.setOnClickListener(v -> {
+            startActivity(new Intent(this, RankingActivity.class));
+            finish();
+        });
+
+        navHome.setOnClickListener(v -> {
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
+        });
+
+        navCourseSetting.setOnClickListener(v -> {
+            startActivity(new Intent(this, DrawCourseActivity.class));
+            finish();
+        });
+
         navMyPage.setOnClickListener(v -> finish());
     }
 }
