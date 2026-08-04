@@ -1,6 +1,7 @@
 package com.example.rundraw_fe;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
@@ -86,17 +87,23 @@ public class DrawCourseActivity extends BaseActivity implements OnMapReadyCallba
             api.saveDraft(request).enqueue(new Callback<DraftDetailResponse>() {
                 @Override
                 public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
-                    if (response.isSuccessful()) {
-                        android.widget.Toast.makeText(DrawCourseActivity.this, "코스 저장 완료!", Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful() && response.body() != null) {
+                        Toast.makeText(DrawCourseActivity.this, "코스 저장 완료!", Toast.LENGTH_SHORT).show();
+
+                        Long savedCourseDraftId = response.body().getCourseDraftId();
+
+                        Intent intent = new Intent(DrawCourseActivity.this, NavigateActivity.class);
+                        intent.putExtra("courseDraftId", savedCourseDraftId);
+                        startActivity(intent);
                         finish();
                     } else {
-                        android.widget.Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), android.widget.Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<DraftDetailResponse> call, Throwable t) {
-                    android.widget.Toast.makeText(DrawCourseActivity.this, "네트워크 오류: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DrawCourseActivity.this, "네트워크 오류: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         });

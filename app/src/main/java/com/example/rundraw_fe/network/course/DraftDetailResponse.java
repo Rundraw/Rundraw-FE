@@ -8,4 +8,5 @@ public class DraftDetailResponse {
     public Boolean isSharing;
     public List<PointDTO> points;
     public String createdAt;
+    public Long getCourseDraftId() { return courseDraftId; }
 }
