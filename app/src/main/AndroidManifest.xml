@@ -20,13 +20,22 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
+
         <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- OAuth Redirect -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="rundraw" android:host="login"/>
             </intent-filter>
         </activity>
 
@@ -61,7 +70,7 @@
         <activity android:name=".CourseSearchActivity" android:exported="false" />
 
         <!-- 코스 상세 화면 -->
-        <activity android:name=".CourseDetailActivity" android:exported="false" />
+        <activity android:name=".CourseDetailActivity" android:exported="false" android:windowSoftInputMode="adjustResize"/>
 
         <!-- 코스 그리기 화면 -->
         <activity android:name=".DrawCourseActivity" android:exported="false" />
@@ -69,6 +78,11 @@
         <!-- 네비게이션 준비 화면 -->
         <activity
             android:name=".NavigateActivity"
+            android:exported="false">
+        </activity>
+
+        <activity
+            android:name=".GpsArtActivity"
             android:exported="false">
         </activity>
 

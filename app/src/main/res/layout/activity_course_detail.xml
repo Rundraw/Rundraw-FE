@@ -282,6 +282,7 @@
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:padding="8dp"
+            android:paddingBottom="8dp"
             android:background="@android:color/white">
 
             <EditText

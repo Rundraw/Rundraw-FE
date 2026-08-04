@@ -29,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.example.rundraw_fe.adapter.CommentAdapter;
@@ -134,7 +135,6 @@ public class CourseDetailActivity extends AppCompatActivity {
                         }
                 );
         commentRecyclerView.setAdapter(commentAdapter);
-        commentInputLayout = findViewById(R.id.commentInputLayout);
         
         // 전달 받은 courseId
         courseId = getIntent().getLongExtra("courseId", 0L);
@@ -148,6 +148,28 @@ public class CourseDetailActivity extends AppCompatActivity {
         commentBehavior.setPeekHeight(0);
         commentBehavior.setDraggable(true);
         commentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        commentInputLayout = findViewById(R.id.commentInputLayout);
+
+        // 댓글 입력창 포커스 시 BottomSheet 확장
+        etComment.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                // BottomSheet 열기
+                commentBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                // 댓글 입력창을 30px 위로 이동
+                commentInputLayout.animate()
+                        .translationY(-70)
+                        .setDuration(200)
+                        .start();
+
+            } else {
+                // 포커스 해제 시 원래 위치
+                commentInputLayout.animate()
+                        .translationY(0)
+                        .setDuration(200)
+                        .start();
+                commentBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
 
         // 상세 조회
         loadCourseDetail();
@@ -343,8 +365,6 @@ public class CourseDetailActivity extends AppCompatActivity {
                         );
             }
         });
-        setupKeyboardListener();
-        setupKeyboard();
     }
 
     private void loadCourseDetail(){
@@ -417,15 +437,19 @@ public class CourseDetailActivity extends AppCompatActivity {
     private void drawCourseRoute(
             List<CourseDetailResponse.Point> points
     ){
-        if(googleMap == null){
+        if(googleMap == null || points == null || points.isEmpty()){
             return;
         }
+
         googleMap.clear();
         List<LatLng> route = new ArrayList<>();
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         for(CourseDetailResponse.Point point : points){
-            route.add(
-                    new LatLng(point.getLatitude(), point.getLongitude())
-            );
+            LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+            route.add(latLng);
+
+            // 모든 좌표 포함
+            boundsBuilder.include(latLng);
         }
 
         // 경로 그리기
@@ -433,12 +457,17 @@ public class CourseDetailActivity extends AppCompatActivity {
                 new PolylineOptions()
                         .addAll(route)
                         .width(10)
-                        .color(android.graphics.Color.rgb(255, 165, 0))
+                        .color(android.graphics.Color.rgb(255,165,0))
         );
 
-        // 첫 위치로 이동
-        googleMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(route.get(0), 15)
+        // 코스 전체 중앙으로 이동
+        LatLngBounds bounds = boundsBuilder.build();
+
+        googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                        bounds,
+                        100   // 여백(px)
+                )
         );
     }
 
@@ -528,40 +557,6 @@ public class CourseDetailActivity extends AppCompatActivity {
         );
     }
 
-    private void setupKeyboardListener(){
-        View rootView = findViewById(android.R.id.content);
-        rootView.getViewTreeObserver()
-                .addOnGlobalLayoutListener(() -> {
-                    Rect rect = new Rect();
-                    rootView.getWindowVisibleDisplayFrame(rect);
-                    int screenHeight = rootView.getRootView().getHeight();
-                    int keypadHeight = screenHeight - rect.bottom;
-                    if(keypadHeight > screenHeight * 0.15){
-                        // 키보드 올라옴
-                        commentBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    }
-                });
-    }
-
-    private void setupKeyboard(){
-        View root = findViewById(android.R.id.content);
-        root.getViewTreeObserver()
-                .addOnGlobalLayoutListener(() -> {
-                    Rect rect = new Rect();
-                    root.getWindowVisibleDisplayFrame(rect);
-                    int screenHeight = root.getRootView().getHeight();
-                    int keyboardHeight = screenHeight - rect.bottom;
-                    if(keyboardHeight > screenHeight * 0.15){
-                        // 키보드 올라옴
-                        commentInputLayout.setTranslationY(
-                                -(keyboardHeight - 550)
-                        );
-                    }else{
-                        // 키보드 내려감
-                        commentInputLayout.setTranslationY(0);
-                    }
-                });
-    }
 
     private void startEditComment(CommentResponse comment){
 
