@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -18,17 +18,9 @@
         tools:targetApi="31"
         android:usesCleartextTraffic="true">
 
+        <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-
-        <activity android:name=".SignActivity" android:exported="false" />
-        <activity android:name=".HomeActivity" android:exported="false" />
-        <activity android:name=".RankingActivity" android:exported="false" />
-
-        <!-- 마이페이지를 앱 실행 시 첫 화면으로 설정 -->
-        <activity
-            android:name=".mypage.MyPageActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -44,9 +36,16 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".mypage.MyPageCommentsActivity" android:exported="false" />
-        <activity android:name=".mypage.MyPageCoursesActivity" android:exported="false" />
-        <activity android:name=".mypage.MyPageScrapActivity" android:exported="false" />
-        <activity android:name=".mypage.MyPageDrawnActivity" android:exported="false" />
+        <!-- 회원가입 화면 -->
+        <activity android:name=".SignActivity" android:exported="false" />
+        <!-- 홈 화면 -->
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <!-- 랭킹 화면 -->
+        <activity android:name=".RankingActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageActivity" />
+        <activity android:name=".mypage.MyPageCommentsActivity" />
+        <activity android:name=".mypage.MyPageCoursesActivity" />
+        <activity android:name=".mypage.MyPageScrapActivity" />
+        <activity android:name=".mypage.MyPageDrawnActivity" />
     </application>
 </manifest>
