@@ -28,10 +28,7 @@ android {
         // 변수 설정
         buildConfigField "String", "OAUTH_URL", "\"${properties.getProperty("OAUTH_URL")}\""
         buildConfigField "String", "LOCAL_URL", "\"${properties.getProperty("LOCAL_URL")}\""
-
-        // local.properties에서 MAPS_API_KEY를 읽어와 AndroidManifest에서 쓸 수 있게 manifestPlaceholders로 등록
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        manifestPlaceholders = [MAPS_API_KEY: properties.getProperty('MAPS_API_KEY')]
+        manifestPlaceholders = [GOOGLE_MAP_KEY: properties.getProperty("GOOGLE_MAP_KEY")]
     }
 
     buildTypes {
@@ -63,7 +60,6 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.12.0"
     implementation "com.squareup.retrofit2:retrofit:2.11.0"
     implementation "com.squareup.retrofit2:converter-gson:2.11.0"
-
-    implementation 'com.google.android.gms:play-services-maps:19.0.0'
-    implementation 'com.google.android.gms:play-services-location:21.3.0'
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
