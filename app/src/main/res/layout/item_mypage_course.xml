@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="12dp"
+    android:background="#E6E6E6"
+    android:layout_marginBottom="8dp">
+
+    <View
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:background="@drawable/bg_profile_circle"
+        android:layout_marginEnd="10dp" />
+
+    <TextView
+        android:id="@+id/tvCourseName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="코스 이름" />
+
+    <View
+        android:id="@+id/statusDot"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/dot_green"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="체험수"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/ivAction"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_run"
+        android:contentDescription="@null"
+        android:visibility="gone" />
+
+</LinearLayout>

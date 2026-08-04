@@ -1,6 +1,7 @@
 package com.example.rundraw_fe;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
@@ -14,10 +15,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.rundraw_fe.auth.RetrofitClient;
-import com.example.rundraw_fe.network.course.CourseApiService;
-import com.example.rundraw_fe.network.course.CreateDraftRequest;
-import com.example.rundraw_fe.network.course.DraftDetailResponse;
-import com.example.rundraw_fe.network.course.PointDTO;
+import com.example.rundraw_fe.api.CourseApiService;
+import com.example.rundraw_fe.api.CourseApiService.CreateDraftRequest;
+import com.example.rundraw_fe.api.CourseApiService.DraftDetailResponse;
+import com.example.rundraw_fe.api.CourseApiService.PointDTO;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class DrawCourseActivity extends BaseActivity implements OnMapReadyCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
@@ -57,6 +58,7 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
         distanceText = findViewById(R.id.distanceText);
         Button saveButton = findViewById(R.id.saveButton);
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
+        setupBottomNavigation(R.id.navigation_route);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -85,17 +87,23 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
             api.saveDraft(request).enqueue(new Callback<DraftDetailResponse>() {
                 @Override
                 public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
-                    if (response.isSuccessful()) {
-                        android.widget.Toast.makeText(DrawCourseActivity.this, "코스 저장 완료!", Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful() && response.body() != null) {
+                        Toast.makeText(DrawCourseActivity.this, "코스 저장 완료!", Toast.LENGTH_SHORT).show();
+
+                        Long savedCourseDraftId = response.body().getCourseDraftId();
+
+                        Intent intent = new Intent(DrawCourseActivity.this, NavigateActivity.class);
+                        intent.putExtra("courseDraftId", savedCourseDraftId);
+                        startActivity(intent);
                         finish();
                     } else {
-                        android.widget.Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), android.widget.Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<DraftDetailResponse> call, Throwable t) {
-                    android.widget.Toast.makeText(DrawCourseActivity.this, "네트워크 오류: " + t.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DrawCourseActivity.this, "네트워크 오류: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         });

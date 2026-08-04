@@ -7,16 +7,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import com.example.rundraw_fe.api.RestaurantApi;
-import com.example.rundraw_fe.auth.RetrofitClient;
-import com.example.rundraw_fe.response.RestaurantResponse;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class HomeActivity extends BaseActivity {
 
     private TextView tvRestaurantName;
@@ -66,29 +56,12 @@ public class HomeActivity extends BaseActivity {
         });
     }
 
-    // 참고: "저장한 맛집" 개인화 API는 백엔드에 아직 없어서, 임시로 전체 목록 중 첫 번째 항목을 표시함.
-    // 주소(address), 평점(rating)도 RestaurantResDTO에 없는 필드라 비워둠.
+    // TODO: 실제로는 서버 API 응답으로 채워야 함 (MypageService 쪽 API 붙일 자리)
     private void loadSavedRestaurant() {
-        RestaurantApi apiService = RetrofitClient.getInstance(this).create(RestaurantApi.class);
-
-        apiService.getAllRestaurants().enqueue(new Callback<List<RestaurantResponse>>() {
-            @Override
-            public void onResponse(Call<List<RestaurantResponse>> call,
-                                   Response<List<RestaurantResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    RestaurantResponse restaurant = response.body().get(0); // 임시: 첫 번째 항목
-
-                    tvRestaurantName.setText(restaurant.getRestaurantName());
-                    tvRestaurantCourse.setText(
-                            restaurant.getCourseTitle() != null ? restaurant.getCourseTitle() : "코스 없음"
-                    );
-                    tvRestaurantAddress.setText(""); // TODO: 백엔드에 address 필드 추가되면 채우기
-                    tvRestaurantRating.setText("");  // TODO: 백엔드에 rating 필드 추가되면 채우기
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<RestaurantResponse>> call, Throwable t) {}
-        });
+        // 데이터 연동 전까지는 비워둠
+        // tvRestaurantName.setText(restaurant.getName());
+        // tvRestaurantAddress.setText(restaurant.getAddress());
+        // tvRestaurantCourse.setText(restaurant.getCourse());
+        // tvRestaurantRating.setText(restaurant.getRating());
     }
 }
