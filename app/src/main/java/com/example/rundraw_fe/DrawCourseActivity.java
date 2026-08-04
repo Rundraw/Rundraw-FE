@@ -14,10 +14,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.rundraw_fe.auth.RetrofitClient;
-import com.example.rundraw_fe.network.course.CourseApiService;
-import com.example.rundraw_fe.network.course.CreateDraftRequest;
-import com.example.rundraw_fe.network.course.DraftDetailResponse;
-import com.example.rundraw_fe.network.course.PointDTO;
+import com.example.rundraw_fe.api.CourseApiService;
+import com.example.rundraw_fe.api.CourseApiService.CreateDraftRequest;
+import com.example.rundraw_fe.api.CourseApiService.DraftDetailResponse;
+import com.example.rundraw_fe.api.CourseApiService.PointDTO;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;

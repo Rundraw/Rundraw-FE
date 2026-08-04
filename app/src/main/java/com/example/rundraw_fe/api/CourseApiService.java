@@ -1,5 +1,8 @@
 package com.example.rundraw_fe.api;
 
+import com.example.rundraw_fe.network.course.CreateDraftRequest;
+import com.example.rundraw_fe.network.course.DraftDetailResponse;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -7,6 +10,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CourseApiService {
 
@@ -33,6 +37,23 @@ public interface CourseApiService {
     // 5. 코스 기록 종료
     @PATCH("/api/user/me/course/record/{recordId}/finish")
     Call<FinishRecordResponse> finishRecord(@Path("recordId") Long recordId);
+
+    // 검색 / 위치기반 조회
+    @GET("/api/course/search")
+    Call<List<CourseSummaryDto>> search(@Query("keyword") String keyword,
+                                        @Query("sort") String sort,
+                                        @Query("lat") Double lat,
+                                        @Query("lng") Double lng);
+
+    @GET("/api/course/")
+    Call<List<CourseSummaryDto>> getByLocation(@Query("lat") double lat,
+                                               @Query("lng") double lng,
+                                               @Query("radius") double radius);
+
+    // 그린 코스 저장
+    @POST("/api/user/me/draft/course")
+    Call<DraftDetailResponse> saveDraft(@Body CreateDraftRequest request);
+
 
     // --- DTO 클래스들 ---
 
@@ -113,5 +134,54 @@ public interface CourseApiService {
         public boolean isCompleted() {
             return isCompleted;
         }
+    }
+
+    class CourseSummaryDto {
+        private Long courseId;
+        private String name;
+        private Integer experienceCount;
+        private String description;
+
+        public Long getCourseId() { return courseId; }
+        public String getName() { return name; }
+        public Integer getExperienceCount() { return experienceCount; }
+        public String getDescription() { return description; }
+    }
+
+    // 요청 DTO
+    class CreateDraftRequest {
+        private String name;
+        private Long memberId;
+        private List<PointDTO> points;
+
+        public CreateDraftRequest(String name, Long memberId, List<PointDTO> points) {
+            this.name = name;
+            this.memberId = memberId;
+            this.points = points;
+        }
+    }
+
+    // 좌표 하나
+    class PointDTO {
+        private Integer sequence;
+        private Double latitude;
+        private Double longitude;
+
+        public PointDTO(Integer sequence, Double latitude, Double longitude) {
+            this.sequence = sequence;
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+    }
+
+    // 응답 DTO
+    class DraftDetailResponse {
+        private Long courseDraftId;
+        private String name;
+        private Boolean isSharing;
+        private List<PointDTO> points;
+        private String createdAt;
+
+        public Long getCourseDraftId() { return courseDraftId; }
     }
 }
