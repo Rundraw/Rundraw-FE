@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -88,14 +89,24 @@ public class DrawCourseActivity extends BaseActivity implements OnMapReadyCallba
                 @Override
                 public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        Toast.makeText(DrawCourseActivity.this, "코스 저장 완료!", Toast.LENGTH_SHORT).show();
-
                         Long savedCourseDraftId = response.body().getCourseDraftId();
 
-                        Intent intent = new Intent(DrawCourseActivity.this, NavigateActivity.class);
-                        intent.putExtra("courseDraftId", savedCourseDraftId);
-                        startActivity(intent);
-                        finish();
+                        new AlertDialog.Builder(DrawCourseActivity.this)
+                                .setMessage("경로 저장을 완료했습니다.")
+                                .setPositiveButton("경로 안내", (dialog, which) -> {
+                                    Intent intent = new Intent(DrawCourseActivity.this, NavigateActivity.class);
+                                    intent.putExtra("courseDraftId", savedCourseDraftId);
+                                    startActivity(intent);
+                                    finish();
+                                })
+                                .setNegativeButton("돌아가기", (dialog, which) -> {
+                                    Intent intent = new Intent(DrawCourseActivity.this, CourseHomeActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    startActivity(intent);
+                                    finish();
+                                })
+                                .setCancelable(false)
+                                .show();
                     } else {
                         Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
