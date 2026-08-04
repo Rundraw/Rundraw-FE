@@ -1,14 +1,12 @@
 package com.example.rundraw_fe.mypage;
 
 import android.os.Bundle;
-import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rundraw_fe.BaseActivity;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.auth.RetrofitClient;
@@ -23,12 +21,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import android.content.Intent;
-import com.example.rundraw_fe.HomeActivity;
-import com.example.rundraw_fe.RankingActivity;
-import com.example.rundraw_fe.DrawCourseActivity;
-
-public class MyPageDrawnActivity extends AppCompatActivity {
+public class MyPageDrawnActivity extends BaseActivity {
 
     private final List<DraftCourseResponse> courseList = new ArrayList<>();
     private MyPageCourseAdapter adapter;
@@ -36,10 +29,7 @@ public class MyPageDrawnActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage_drawn);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        setContentLayout(R.layout.activity_mypage_drawn);
 
         RecyclerView rvCourses = findViewById(R.id.rvCourses);
         adapter = new MyPageCourseAdapter(courseList, MyPageCourseAdapter.MODE_ICON);
@@ -47,7 +37,7 @@ public class MyPageDrawnActivity extends AppCompatActivity {
         rvCourses.setAdapter(adapter);
 
         loadDrawnCourses();
-        setupBottomNavigation();
+        setupBottomNavigation(R.id.navigation_my);
     }
 
     private void loadDrawnCourses() {
@@ -68,29 +58,5 @@ public class MyPageDrawnActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ApiResponse<DraftCourseListResponse>> call, Throwable t) {}
         });
-    }
-
-    private void setupBottomNavigation() {
-        LinearLayout navRanking = findViewById(R.id.navRanking);
-        LinearLayout navHome = findViewById(R.id.navHome);
-        LinearLayout navCourseSetting = findViewById(R.id.navCourseSetting);
-        LinearLayout navMyPage = findViewById(R.id.navMyPage);
-
-        navRanking.setOnClickListener(v -> {
-            startActivity(new Intent(this, RankingActivity.class));
-            finish();
-        });
-
-        navHome.setOnClickListener(v -> {
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
-        });
-
-        navCourseSetting.setOnClickListener(v -> {
-            startActivity(new Intent(this, DrawCourseActivity.class));
-            finish();
-        });
-
-        navMyPage.setOnClickListener(v -> finish());
     }
 }
