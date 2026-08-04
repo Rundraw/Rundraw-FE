@@ -1,8 +1,5 @@
 package com.example.rundraw_fe.api;
 
-import com.example.rundraw_fe.network.course.CreateDraftRequest;
-import com.example.rundraw_fe.network.course.DraftDetailResponse;
-
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
