@@ -19,7 +19,7 @@
         android:usesCleartextTraffic="true">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${GOOGLE_MAP_KEY}" />
+            android:value="${MAPS_API_KEY}" />
         <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
@@ -64,8 +64,7 @@
         <activity android:name=".CourseDetailActivity" android:exported="false" />
 
         <!-- 코스 그리기 화면 -->
-        <activity
-            android:name=".DrawCourseActivity" android:exported="false" />
+        <activity android:name=".DrawCourseActivity" android:exported="false" />
 
         <!-- 네비게이션 준비 화면 -->
         <activity
