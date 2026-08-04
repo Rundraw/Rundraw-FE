@@ -28,7 +28,7 @@ android {
         // 변수 설정
         buildConfigField "String", "OAUTH_URL", "\"${properties.getProperty("OAUTH_URL")}\""
         buildConfigField "String", "LOCAL_URL", "\"${properties.getProperty("LOCAL_URL")}\""
-        manifestPlaceholders = [GOOGLE_MAP_KEY: properties.getProperty("GOOGLE_MAP_KEY")]
+        manifestPlaceholders = [MAPS_API_KEY: properties.getProperty("MAPS_API_KEY")]
     }
 
     buildTypes {

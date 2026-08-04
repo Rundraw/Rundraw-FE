@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.response.GpsArtResponse;
 import com.example.rundraw_fe.response.PointResponse;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -104,7 +105,7 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
     private void drawRoute(
             GoogleMap googleMap,
             GpsArtResponse gpsArt
-    ){
+    ) {
         boolean success = googleMap.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style));
         if (!success) {
@@ -112,13 +113,13 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
         }
         List<PointResponse> points = gpsArt.getPoints();
 
-        if(points == null || points.isEmpty()){
+        if (points == null || points.isEmpty()) {
             return;
         }
 
         List<LatLng> route = new ArrayList<>();
 
-        for(PointResponse point : points){
+        for (PointResponse point : points) {
             route.add(
                     new LatLng(
                             point.getLatitude(),
@@ -134,7 +135,23 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
                         .width(10)
                         .color(Color.rgb(255, 165, 0))
         );
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.get(0), 15));
+
+        // 전체 경로를 포함하는 영역 계산
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        for (LatLng latLng : route) {
+            builder.include(latLng);
+        }
+
+        LatLngBounds bounds = builder.build();
+
+        googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                        bounds,
+                        100   // 여백(px)
+                )
+        );
+
         googleMap.getUiSettings().setScrollGesturesEnabled(false);
         googleMap.getUiSettings().setZoomGesturesEnabled(false);
     }
