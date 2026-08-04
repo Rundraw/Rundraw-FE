@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface CourseApiService {
 
@@ -33,6 +34,18 @@ public interface CourseApiService {
     // 5. 코스 기록 종료
     @PATCH("/api/user/me/course/record/{recordId}/finish")
     Call<FinishRecordResponse> finishRecord(@Path("recordId") Long recordId);
+
+    // 검색 / 위치기반 조회
+    @GET("/api/course/search")
+    Call<List<CourseSummaryDto>> search(@Query("keyword") String keyword,
+                                        @Query("sort") String sort,
+                                        @Query("lat") Double lat,
+                                        @Query("lng") Double lng);
+
+    @GET("/api/course/")
+    Call<List<CourseSummaryDto>> getByLocation(@Query("lat") double lat,
+                                               @Query("lng") double lng,
+                                               @Query("radius") double radius);
 
     // --- DTO 클래스들 ---
 
@@ -113,5 +126,17 @@ public interface CourseApiService {
         public boolean isCompleted() {
             return isCompleted;
         }
+    }
+
+    class CourseSummaryDto {
+        private Long courseId;
+        private String name;
+        private Integer experienceCount;
+        private String description;
+
+        public Long getCourseId() { return courseId; }
+        public String getName() { return name; }
+        public Integer getExperienceCount() { return experienceCount; }
+        public String getDescription() { return description; }
     }
 }

@@ -59,7 +59,7 @@
             </intent-filter>
         </activity>
 
-        <!-- 네비게이션 준비 화면 (앱 시작 첫 화면으로 지정) -->
+        <!-- 네비게이션 준비 화면 -->
         <activity
             android:name=".NavigateActivity"
             android:exported="false">
