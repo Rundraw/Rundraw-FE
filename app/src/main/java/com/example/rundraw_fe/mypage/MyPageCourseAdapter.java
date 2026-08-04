@@ -22,6 +22,17 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
     private final List<String> courseList;
     private final int mode;
 
+    // 1. 클릭 리스너 인터페이스 정의
+    public interface OnItemClickListener {
+        void onItemClick(int position, String courseName);
+    }
+
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     public MyPageCourseAdapter(List<String> courseList, int mode) {
         this.courseList = courseList;
         this.mode = mode;
@@ -37,11 +48,19 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.tvCourseName.setText(courseList.get(position));
+        String courseName = courseList.get(position);
+        holder.tvCourseName.setText(courseName);
 
         holder.statusDot.setVisibility(mode == MODE_STATUS_DOT ? View.VISIBLE : View.GONE);
         holder.tvCount.setVisibility(mode == MODE_COUNT ? View.VISIBLE : View.GONE);
         holder.ivAction.setVisibility(mode == MODE_ICON ? View.VISIBLE : View.GONE);
+
+        // 2. 아이템 전체를 눌렀을 때 이벤트 전달
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(position, courseName);
+            }
+        });
     }
 
     @Override

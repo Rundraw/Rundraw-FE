@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -18,7 +18,7 @@
         tools:targetApi="31"
         android:usesCleartextTraffic="true">
 
-        <!-- 앱 시작 Activity -->
+        <!-- 앱 시작 Activity (MainActivity) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -36,16 +36,21 @@
             </intent-filter>
         </activity>
 
-        <!-- 회원가입 화면 -->
+        <!-- 주요 화면 -->
         <activity android:name=".SignActivity" android:exported="false" />
-        <!-- 홈 화면 -->
         <activity android:name=".HomeActivity" android:exported="false" />
-        <!-- 랭킹 화면 -->
         <activity android:name=".RankingActivity" android:exported="false" />
-        <activity android:name=".mypage.MyPageActivity" />
-        <activity android:name=".mypage.MyPageCommentsActivity" />
-        <activity android:name=".mypage.MyPageCoursesActivity" />
-        <activity android:name=".mypage.MyPageScrapActivity" />
-        <activity android:name=".mypage.MyPageDrawnActivity" />
+
+        <!-- 마이페이지 관련 화면 -->
+        <activity android:name=".mypage.MyPageActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageCommentsActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageCoursesActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageScrapActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageDrawnActivity" android:exported="false" />
+
+        <!-- 코스 설정 및 상세 화면 -->
+        <activity android:name=".mypage.CourseSettingActivity" android:exported="false" />
+        <activity android:name=".mypage.CourseDetailActivity" android:exported="false" />
+
     </application>
 </manifest>
