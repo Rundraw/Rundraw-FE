@@ -35,6 +35,7 @@ public class GpsArtActivity extends BaseActivity {
         );
         adapter = new GpsArtAdapter(
                 this,
+                false,
                 courseId -> {
                     Intent intent =
                             new Intent(
