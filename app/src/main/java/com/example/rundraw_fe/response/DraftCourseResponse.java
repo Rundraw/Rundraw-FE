@@ -1,17 +1,18 @@
 package com.example.rundraw_fe.response;
 
-import com.example.rundraw_fe.mypage.MyPageCourseItem;
+import com.google.gson.annotations.SerializedName;
 
-public class DraftCourseResponse implements MyPageCourseItem {
+public class DraftCourseResponse {
+    @SerializedName("draftCourseId")
     private Long draftCourseId;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("isSharing")
     private Boolean isSharing;
 
     public Long getDraftCourseId() { return draftCourseId; }
-
-    @Override
-    public String getDisplayName() { return name; }
-
-    @Override
+    public String getName() { return name; }
     public Boolean getIsSharing() { return isSharing; }
 }
