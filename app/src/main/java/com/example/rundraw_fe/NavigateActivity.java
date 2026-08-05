@@ -66,11 +66,8 @@ public class NavigateActivity extends AppCompatActivity implements OnMapReadyCal
         courseDraftId = getIntent().getLongExtra("courseDraftId", 1L);
         Log.d(TAG, "1. 전달받은 courseDraftId: " + courseDraftId);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiService = retrofit.create(CourseApiService.class);
+        // 수정 (공용 RetrofitClient 사용, 토큰 자동 포함)
+        apiService = com.example.rundraw_fe.auth.RetrofitClient.getInstance(this).create(CourseApiService.class);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);

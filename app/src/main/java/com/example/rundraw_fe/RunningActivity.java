@@ -83,6 +83,11 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private float totalDistanceMeters = 0.0f;
     private Location lastLocation = null;
 
+    // TTS 초기화 + navigation 로드 + 트리거 체크
+    private android.speech.tts.TextToSpeech tts;
+    private List<CourseApiService.InstructionDto> instructions = new ArrayList<>();
+    private final List<Boolean> instructionPlayed = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +111,14 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(CourseApiService.class);
+
+        tts = new android.speech.tts.TextToSpeech(this, status -> {
+            if (status == android.speech.tts.TextToSpeech.SUCCESS) {
+                tts.setLanguage(Locale.KOREAN);
+            }
+        });
+
+        loadNavigation(courseDraftId);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -145,6 +158,25 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         startCourseRecord(courseDraftId);
     }
 
+    private void loadNavigation(Long courseId) {
+        apiService.getNavigation(courseId).enqueue(new Callback<CourseApiService.NavigationResponse>() {
+            @Override
+            public void onResponse(Call<CourseApiService.NavigationResponse> call, Response<CourseApiService.NavigationResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    instructions = response.body().getInstructions();
+                    for (int i = 0; i < instructions.size(); i++) {
+                        instructionPlayed.add(false);
+                    }
+                    Log.d(TAG, "내비게이션 안내 " + instructions.size() + "개 로드 완료");
+                }
+            }
+            @Override
+            public void onFailure(Call<CourseApiService.NavigationResponse> call, Throwable t) {
+                Log.e(TAG, "내비게이션 로드 실패: " + t.getMessage());
+            }
+        });
+    }
+
     // ★ 실시간 위치 변경 감지 및 처리 콜백
     private void setupLocationCallback() {
         locationCallback = new LocationCallback() {
@@ -175,10 +207,28 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
                         // 3. 백엔드 POST /point 좌표 전송
                         sendCurrentLocation(currentLat, currentLng);
+                        checkNavigationTriggers(currentLat, currentLng);
                     }
                 }
             }
         };
+    }
+
+    private void checkNavigationTriggers(double lat, double lng) {
+        for (int i = 0; i < instructions.size(); i++) {
+            if (instructionPlayed.get(i)) continue;
+
+            CourseApiService.InstructionDto instruction = instructions.get(i);
+            float[] result = new float[1];
+            android.location.Location.distanceBetween(
+                    lat, lng, instruction.getLatitude(), instruction.getLongitude(), result);
+
+            if (result[0] <= instruction.getTriggerDistanceM()) {
+                tts.speak(instruction.getText(), android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, null);
+                instructionPlayed.set(i, true);
+                Log.d(TAG, "음성 안내 재생: " + instruction.getText());
+            }
+        }
     }
 
     // 거리 및 페이스 실시간 UI 반영
@@ -618,6 +668,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
         if (fusedLocationClient != null && locationCallback != null) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
         }
     }
 }
