@@ -15,7 +15,7 @@ import com.example.rundraw_fe.R;
 // 만약 내비게이션 화면 클래스가 있다면 임포트하세요.
 // import com.example.rundraw_fe.navigation.NavigationActivity;
 
-public class CourseDetailActivity extends AppCompatActivity {
+public class MypageCourseDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class CourseDetailActivity extends AppCompatActivity {
 
         // 2. 상단 '톱니바퀴(설정)' 아이콘 클릭 시 -> 코스 설정 화면(CourseSettingActivity)으로 이동
         imgSettingBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(CourseDetailActivity.this, CourseSettingActivity.class);
+            Intent intent = new Intent(MypageCourseDetailActivity.this, CourseSettingActivity.class);
             // 필요하다면 코스 이름도 함께 넘겨줄 수 있습니다.
             intent.putExtra("courseName", courseName);
             startActivity(intent);

@@ -34,7 +34,7 @@ public class MyPageDrawnActivity extends AppCompatActivity {
 
         // 어댑터 아이템 클릭 시 상세 화면(CourseDetailActivity)으로 이동하도록 리스너 추가
         adapter.setOnItemClickListener((position, courseName) -> {
-            Intent intent = new Intent(MyPageDrawnActivity.this, CourseDetailActivity.class);
+            Intent intent = new Intent(MyPageDrawnActivity.this, MypageCourseDetailActivity.class);
             intent.putExtra("courseName", courseName);
             startActivity(intent);
         });

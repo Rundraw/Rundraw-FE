@@ -50,7 +50,7 @@
 
         <!-- 코스 설정 및 상세 화면 -->
         <activity android:name=".mypage.CourseSettingActivity" android:exported="false" />
-        <activity android:name=".mypage.CourseDetailActivity" android:exported="false" />
+        <activity android:name=".mypage.MypageCourseDetailActivity" android:exported="false" />
 
     </application>
 </manifest>
