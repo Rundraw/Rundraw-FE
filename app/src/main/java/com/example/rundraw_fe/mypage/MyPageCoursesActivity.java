@@ -44,8 +44,14 @@ public class MyPageCoursesActivity extends BaseActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 loadCourses(tab.getPosition() == 0); // 0: 완주, 1: 체험
             }
-            @Override public void onTabUnselected(TabLayout.Tab tab) {}
-            @Override public void onTabReselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
 
         loadCourses(true);
@@ -56,9 +62,8 @@ public class MyPageCoursesActivity extends BaseActivity {
         MypageApiService apiService = RetrofitClient.getInstance(this)
                 .create(MypageApiService.class);
 
-        String type = isCompleted ? "completed" : "attempted";
-
-        apiService.getCourses(type).enqueue(new Callback<ApiResponse<CourseRecordListResponse>>() {
+        // String type 대신 boolean 값을 그대로 넘겨줍니다. (탭이 0번째면 true, 아니면 false)
+        apiService.getCourses(isCompleted).enqueue(new Callback<ApiResponse<CourseRecordListResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<CourseRecordListResponse>> call,
                                    Response<ApiResponse<CourseRecordListResponse>> response) {
@@ -70,7 +75,8 @@ public class MyPageCoursesActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<CourseRecordListResponse>> call, Throwable t) {}
+            public void onFailure(Call<ApiResponse<CourseRecordListResponse>> call, Throwable t) {
+            }
         });
     }
 }
