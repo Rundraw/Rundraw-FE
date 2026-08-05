@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="MyPageMenuButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">48dp</item>
@@ -9,4 +8,9 @@
         <item name="android:layout_marginBottom">10dp</item>
     </style>
 
+    <style name="ShapeAppearanceOverlay.BottomNavIndicator"
+        parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.rundraw_fe.mypage;
 
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,14 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rundraw_fe.R;
+import com.example.rundraw_fe.response.MypageCommentResponse;
 
 import java.util.List;
 
 public class MyPageCommentAdapter extends RecyclerView.Adapter<MyPageCommentAdapter.ViewHolder> {
 
-    private final List<String> commentList;
+    private final List<MypageCommentResponse> commentList;
 
-    public MyPageCommentAdapter(List<String> commentList) {
+    public MyPageCommentAdapter(List<MypageCommentResponse> commentList) {
         this.commentList = commentList;
     }
 
@@ -30,7 +32,8 @@ public class MyPageCommentAdapter extends RecyclerView.Adapter<MyPageCommentAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.tvContent.setText(commentList.get(position));
+        MypageCommentResponse comment = commentList.get(position);
+        holder.tvContent.setText(comment.getContent());
     }
 
     @Override

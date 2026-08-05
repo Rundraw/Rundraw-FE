@@ -1,17 +1,25 @@
 package com.example.rundraw_fe;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.rundraw_fe.auth.RetrofitClient;
+import com.example.rundraw_fe.api.CourseApiService;
+import com.example.rundraw_fe.api.CourseApiService.CreateDraftRequest;
+import com.example.rundraw_fe.api.CourseApiService.DraftDetailResponse;
+import com.example.rundraw_fe.api.CourseApiService.PointDTO;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,7 +34,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyCallback {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class DrawCourseActivity extends BaseActivity implements OnMapReadyCallback {
 
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
@@ -47,6 +59,7 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
         distanceText = findViewById(R.id.distanceText);
         Button saveButton = findViewById(R.id.saveButton);
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
+        setupBottomNavigation(R.id.navigation_route);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -55,7 +68,55 @@ public class DrawCourseActivity extends AppCompatActivity implements OnMapReadyC
         mapFragment.getMapAsync(this); // 지도가 준비되면 onMapReady 호출됨
 
         saveButton.setOnClickListener(v -> {
-            // 다음 단계(서버 저장 API 연동)에서 채울 부분
+            String courseName = courseNameInput.getText().toString();
+
+            if (courseName.isEmpty() || waypoints.size() < 3) {
+                android.widget.Toast.makeText(this, "코스 이름과 3개 이상의 좌표가 필요합니다.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            List<PointDTO> pointDTOS = new ArrayList<>();
+            for (int i = 0; i < waypoints.size(); i++) {
+                LatLng p = waypoints.get(i);
+                pointDTOS.add(new PointDTO(i + 1, p.latitude, p.longitude));
+            }
+
+            Long tempMemberId = 1L; // 인증 붙기 전 임시값
+            CreateDraftRequest request = new CreateDraftRequest(courseName, tempMemberId, pointDTOS);
+
+            CourseApiService api = RetrofitClient.getInstance(this).create(CourseApiService.class);
+            api.saveDraft(request).enqueue(new Callback<DraftDetailResponse>() {
+                @Override
+                public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Long savedCourseDraftId = response.body().getCourseDraftId();
+
+                        new AlertDialog.Builder(DrawCourseActivity.this)
+                                .setMessage("경로 저장을 완료했습니다.")
+                                .setPositiveButton("경로 안내", (dialog, which) -> {
+                                    Intent intent = new Intent(DrawCourseActivity.this, NavigateActivity.class);
+                                    intent.putExtra("courseDraftId", savedCourseDraftId);
+                                    startActivity(intent);
+                                    finish();
+                                })
+                                .setNegativeButton("돌아가기", (dialog, which) -> {
+                                    Intent intent = new Intent(DrawCourseActivity.this, CourseHomeActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    startActivity(intent);
+                                    finish();
+                                })
+                                .setCancelable(false)
+                                .show();
+                    } else {
+                        Toast.makeText(DrawCourseActivity.this, "저장 실패: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<DraftDetailResponse> call, Throwable t) {
+                    Toast.makeText(DrawCourseActivity.this, "네트워크 오류: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

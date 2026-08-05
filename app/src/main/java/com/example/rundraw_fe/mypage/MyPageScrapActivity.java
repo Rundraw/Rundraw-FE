@@ -1,52 +1,62 @@
 package com.example.rundraw_fe.mypage;
 
 import android.os.Bundle;
-import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rundraw_fe.BaseActivity;
 import com.example.rundraw_fe.R;
+import com.example.rundraw_fe.api.MypageApiService;
+import com.example.rundraw_fe.auth.RetrofitClient;
+import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.ScrapCourseListResponse;
+import com.example.rundraw_fe.response.ScrapCourseResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyPageScrapActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private final List<String> courseList = new ArrayList<>();
+public class MyPageScrapActivity extends BaseActivity {
+
+    private final List<ScrapCourseResponse> courseList = new ArrayList<>();
+    private MyPageCourseAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage_scrap);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        setContentLayout(R.layout.activity_mypage_scrap);
 
         RecyclerView rvCourses = findViewById(R.id.rvCourses);
-        MyPageCourseAdapter adapter = new MyPageCourseAdapter(courseList, MyPageCourseAdapter.MODE_COUNT);
+        adapter = new MyPageCourseAdapter(courseList, MyPageCourseAdapter.MODE_COUNT);
         rvCourses.setLayoutManager(new LinearLayoutManager(this));
         rvCourses.setAdapter(adapter);
 
-        // TODO: MypageService API 연동 - GET /mypage/scraps
-        // courseList.addAll(response.getScraps());
-        // adapter.notifyDataSetChanged();
-
-        setupBottomNavigation();
+        loadScraps();
+        setupBottomNavigation(R.id.navigation_my);
     }
 
-    private void setupBottomNavigation() {
-        LinearLayout navRanking = findViewById(R.id.navRanking);
-        LinearLayout navHome = findViewById(R.id.navHome);
-        LinearLayout navCourseSetting = findViewById(R.id.navCourseSetting);
-        LinearLayout navMyPage = findViewById(R.id.navMyPage);
+    private void loadScraps() {
+        MypageApiService apiService = RetrofitClient.getInstance(this)
+                .create(MypageApiService.class);
 
-        navRanking.setOnClickListener(v -> { /* TODO */ });
-        navHome.setOnClickListener(v -> { /* TODO */ });
-        navCourseSetting.setOnClickListener(v -> { /* TODO */ });
-        navMyPage.setOnClickListener(v -> finish());
+        apiService.getScraps().enqueue(new Callback<ApiResponse<ScrapCourseListResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ScrapCourseListResponse>> call,
+                                   Response<ApiResponse<ScrapCourseListResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    courseList.clear();
+                    courseList.addAll(response.body().getResult().getScrapCourses());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ScrapCourseListResponse>> call, Throwable t) {}
+        });
     }
 }

@@ -19,6 +19,10 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+
+
+
+
         // OAuth 로그인 후 redirect 처리
         handleOAuthRedirect();
 
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
                     Uri.parse(url));
             startActivity(intent);
         });
+
     }
 
     private void handleOAuthRedirect() {
@@ -67,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             // 기존 회원
             Intent intent = new Intent(
                     MainActivity.this,
-                    RankingActivity.class);
+                    HomeActivity.class);
             startActivity(intent);
         }
         finish();

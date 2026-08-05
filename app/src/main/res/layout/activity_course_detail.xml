@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@drawable/bg_detail_page">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+
+
+            <!-- 제목 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+
+                <!-- 뒤로가기 버튼 -->
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_back"
+
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+                <!-- 제목 중앙 -->
+                <TextView
+                    android:id="@+id/tvCourseName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="한강 공원 루프"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <!-- 지도 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="5dp">
+                <com.google.android.gms.maps.MapView
+                    android:id="@+id/courseMap"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"/>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- 작성자 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:gravity="center_vertical"
+                android:layout_marginTop="15dp">
+
+                <ImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/ic_profile"
+                    android:background="@drawable/circle_background"
+                    android:clipToOutline="true"/>
+
+
+                <TextView
+                    android:id="@+id/tvWriter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="솔순"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/tvLevel"
+                    android:layout_width="85dp"
+                    android:layout_height="38dp"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="초급"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_level"/>
+
+            </LinearLayout>
+
+            <!-- 설명 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp">
+
+
+                <TextView
+                    android:id="@+id/tvDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="24dp"
+                    android:text="한강 공원을 따라 달리는 평탄한 순환 코스에요.\n초보자도 부담 없이 강변 풍경을 즐길 수 있어요."
+                    android:textSize="15sp"/>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- 좋아요 / 댓글 / 북마크 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- 좋아요 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/ivLike"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_heart_empty"/>
+
+                    <TextView
+                        android:id="@+id/tvLikeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="20"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+                <!-- 댓글 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/ivComment"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_messages" />
+
+                    <TextView
+                        android:id="@+id/tvCommentCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="3"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <!-- 북마크 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/ivBookmark"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_bookmark_empty"/>
+
+                    <TextView
+                        android:id="@+id/tvBookmarkCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="3"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!-- 체험 버튼 -->
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnStart"
+                android:layout_width="260dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center_horizontal"
+                android:text="체 험 해 보 기"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_detail_button"
+                android:backgroundTint="@null"
+                android:textAllCaps="false"/>
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+
+    <!-- 댓글 Bottom Sheet -->
+
+    <LinearLayout
+        android:id="@+id/commentSheet"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:orientation="vertical"
+        android:fitsSystemWindows="true"
+        android:background="@drawable/bg_comment_sheet"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <!-- 손잡이 -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="5dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="#BBBBBB"/>
+
+        <!-- 제목 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:paddingStart="30dp"
+            android:gravity="center_vertical"
+            android:text="댓글"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <!-- 댓글 목록 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/commentRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            />
+
+        <!-- 댓글 작성 영역 -->
+        <LinearLayout
+            android:id="@+id/commentInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:paddingBottom="8dp"
+            android:background="@android:color/white">
+
+            <EditText
+                android:id="@+id/etComment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="댓글을 입력하세요"
+                android:inputType="textMultiLine"
+                android:maxLines="3"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_edit_text"/>
+
+            <Button
+                android:id="@+id/btnCommentSend"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:text="등록"
+                android:textStyle="bold"
+                android:padding="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:gravity="center"
+                android:layout_marginLeft="15dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
