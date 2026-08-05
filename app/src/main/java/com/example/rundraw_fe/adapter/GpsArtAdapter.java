@@ -24,6 +24,8 @@ import java.util.List;
 
 public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder>{
     private Context context;
+
+    private boolean isHome;
     private List<GpsArtResponse> items =
             new ArrayList<>();
     public void setItems(
@@ -34,14 +36,19 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
     }
     private OnItemClickListener listener;
 
-    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(
             @NonNull ViewGroup parent,
             int viewType
     ){
+        int layout;
+        if(isHome){
+            layout = R.layout.item_home_gps_art;
+        }else{
+            layout = R.layout.item_gps_art;
+        }
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_gps_art, parent, false);
+                .inflate(layout, parent, false);
         return new ViewHolder(view);
     }
 
@@ -176,12 +183,13 @@ public class GpsArtAdapter extends RecyclerView.Adapter<GpsArtAdapter.ViewHolder
     }
     public GpsArtAdapter(
             Context context,
+            boolean isHome,
             OnItemClickListener listener
     ){
         this.context = context;
+        this.isHome = isHome;
         this.listener = listener;
     }
-
     public interface OnItemClickListener {
         void onClick(Long courseId);
     }

@@ -51,6 +51,12 @@ public interface CourseApiService {
     @POST("/api/user/me/draft/course")
     Call<DraftDetailResponse> saveDraft(@Body CreateDraftRequest request);
 
+    // 내비게이션
+    @GET("/api/course/{courseId}/navigation")
+    Call<NavigationResponse> getNavigation(@Path("courseId") Long courseId);
+    @GET("/api/course/draft/{courseDraftId}/navigation")
+    Call<NavigationResponse> getNavigationFromDraft(@Path("courseDraftId") Long courseDraftId);
+
 
     // --- DTO 클래스들 ---
 
@@ -180,5 +186,26 @@ public interface CourseApiService {
         private String createdAt;
 
         public Long getCourseDraftId() { return courseDraftId; }
+    }
+
+    // 내비게이션 응답
+
+    // DTO 클래스들 안, 다른 class들 옆에 추가
+    class NavigationResponse {
+        private List<InstructionDto> instructions;
+        public List<InstructionDto> getInstructions() { return instructions; }
+    }
+
+    class InstructionDto {
+        private Integer sequence;
+        private double latitude;
+        private double longitude;
+        private String text;
+        private double triggerDistanceM;
+
+        public double getLatitude() { return latitude; }
+        public double getLongitude() { return longitude; }
+        public String getText() { return text; }
+        public double getTriggerDistanceM() { return triggerDistanceM; }
     }
 }

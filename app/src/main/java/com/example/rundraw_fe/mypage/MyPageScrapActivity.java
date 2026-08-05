@@ -23,7 +23,7 @@ import retrofit2.Response;
 
 public class MyPageScrapActivity extends BaseActivity {
 
-    private final List<ScrapCourseResponse> courseList = new ArrayList<>();
+    private final List<String> courseList = new ArrayList<>();
     private MyPageCourseAdapter adapter;
 
     @Override
@@ -50,7 +50,9 @@ public class MyPageScrapActivity extends BaseActivity {
                                    Response<ApiResponse<ScrapCourseListResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     courseList.clear();
-                    courseList.addAll(response.body().getResult().getScrapCourses());
+                    for (ScrapCourseResponse course : response.body().getResult().getScrapCourses()) {
+                        courseList.add(course.getDisplayName());
+                    }
                     adapter.notifyDataSetChanged();
                 }
             }

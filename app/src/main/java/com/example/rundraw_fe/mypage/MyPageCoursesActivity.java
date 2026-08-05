@@ -26,7 +26,7 @@ public class MyPageCoursesActivity extends BaseActivity {
 
     private RecyclerView rvCourses;
     private MyPageCourseAdapter adapter;
-    private final List<CourseRecordResponse> courseList = new ArrayList<>();
+    private final List<String> courseList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +69,9 @@ public class MyPageCoursesActivity extends BaseActivity {
                                    Response<ApiResponse<CourseRecordListResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     courseList.clear();
-                    courseList.addAll(response.body().getResult().getCourseRecords());
+                    for (CourseRecordResponse course : response.body().getResult().getCourseRecords()) {
+                        courseList.add(course.getCourseName());
+                    }
                     adapter.notifyDataSetChanged();
                 }
             }
