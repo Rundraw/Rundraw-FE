@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.rundraw_fe.mypage.MyPageActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -66,8 +68,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
 
             if (id == R.id.navigation_my) {
-                if (!(this instanceof GpsArtActivity)) {
-                    startActivity(new Intent(this, GpsArtActivity.class));
+                if (!(this instanceof MyPageActivity)) {
+                    startActivity(new Intent(this, MyPageActivity.class));
                     finish();
                 }
                 return true;
