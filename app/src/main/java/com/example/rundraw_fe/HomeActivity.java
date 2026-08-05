@@ -4,14 +4,26 @@ import static androidx.core.content.ContextCompat.startActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.rundraw_fe.adapter.GpsArtAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rundraw_fe.adapter.GpsArtAdapter;
+import com.example.rundraw_fe.api.RankingApi;
 import com.example.rundraw_fe.api.RestaurantApi;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.mypage.MyPageCoursesActivity;
+import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.GpsArtResponse;
+import com.example.rundraw_fe.response.PaginationResponse;
 import com.example.rundraw_fe.response.RestaurantResponse;
 
 import java.util.List;
@@ -30,6 +42,9 @@ public class HomeActivity extends BaseActivity {
     private LinearLayout sectionMyRoute;
     private LinearLayout sectionMyRestaurant;
     private LinearLayout sectionGpsArt;
+    private RecyclerView gpsArtRecyclerView;
+    private GpsArtAdapter gpsArtAdapter;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +54,7 @@ public class HomeActivity extends BaseActivity {
         initViews();
         loadSavedRestaurant();
         setupSectionClickListeners();
+        loadGpsArt();
         setupBottomNavigation(R.id.navigation_home);
     }
 
@@ -51,6 +67,7 @@ public class HomeActivity extends BaseActivity {
         sectionMyRoute = findViewById(R.id.sectionMyRoute);
         sectionMyRestaurant = findViewById(R.id.sectionMyRestaurant);
         sectionGpsArt = findViewById(R.id.sectionGpsArt);
+        gpsArtRecyclerView = findViewById(R.id.gpsArtRecyclerView);
     }
 
     private void setupSectionClickListeners() {
@@ -91,5 +108,53 @@ public class HomeActivity extends BaseActivity {
             @Override
             public void onFailure(Call<List<RestaurantResponse>> call, Throwable t) {}
         });
+    }
+
+    private void loadGpsArt() {
+        // 가로 스크롤 방식
+        gpsArtRecyclerView.setLayoutManager(
+                new GridLayoutManager(
+                        this,
+                        2
+                )
+        );
+
+
+        gpsArtAdapter = new GpsArtAdapter(
+                this,
+                true,
+                courseId -> {
+                    Intent intent = new Intent(HomeActivity.this, CourseDetailActivity.class);
+                    intent.putExtra("courseId", courseId);
+                    startActivity(intent);
+                }
+        );
+        gpsArtRecyclerView.setAdapter(gpsArtAdapter);
+        RankingApi apiService = RetrofitClient.getInstance(this).create(RankingApi.class);
+        apiService.getGpsArt(2, "-1").enqueue(
+                new Callback<ApiResponse<PaginationResponse<GpsArtResponse>>>() {
+                            @Override
+                            public void onResponse(
+                                    Call<ApiResponse<PaginationResponse<GpsArtResponse>>> call,
+                                    Response<ApiResponse<PaginationResponse<GpsArtResponse>>> response
+                            ) {
+                                if(response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                    List<GpsArtResponse> list = response.body().getResult().getData();
+                                    gpsArtAdapter.setItems(list);
+                                    Log.d("HOME_GPS_ART", "조회 개수 : " + list.size());
+                                } else {
+                                    Log.e("HOME_GPS_ART", "응답 실패 : " + response.code());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(
+                                    Call<ApiResponse<PaginationResponse<GpsArtResponse>>> call,
+                                    Throwable t
+                            ) {
+                                Log.e("HOME_GPS_ART", "조회 실패", t);
+                            }
+                        }
+                );
     }
 }

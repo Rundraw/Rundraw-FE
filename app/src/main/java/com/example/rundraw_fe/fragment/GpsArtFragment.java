@@ -47,6 +47,7 @@ public class GpsArtFragment extends Fragment {
 
         adapter = new GpsArtAdapter(
                 requireContext(),
+                false,
                 courseId -> {
 
 
@@ -64,7 +65,6 @@ public class GpsArtFragment extends Fragment {
 
 
                     startActivity(intent);
-
 
                 }
         );
@@ -88,7 +88,8 @@ public class GpsArtFragment extends Fragment {
                             ){
 
                                 if(response.isSuccessful()
-                                        && response.body()!=null){
+                                        && response.body()!=null
+                                        && response.body().isSuccess()) {
 
 
                                     adapter.setItems(
@@ -96,13 +97,11 @@ public class GpsArtFragment extends Fragment {
                                                     .getResult()
                                                     .getData()
                                     );
-
-
+                                    Log.d("GPS_ART", "조회 개수 : " + response.body().getResult().getData().size());
+                                } else {
+                                    Log.e("GPS_ART", "응답 실패 : " + response.code());
                                 }
-
                             }
-
-
 
                             @Override
                             public void onFailure(
