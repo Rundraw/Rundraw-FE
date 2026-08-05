@@ -27,12 +27,16 @@ public class CourseDetailActivity extends AppCompatActivity {
         Button btnStartNavigation = findViewById(R.id.btnStartNavigation);
         ImageView imgSettingBtn = findViewById(R.id.imgSettingBtn);
         ImageView imgShareBtn = findViewById(R.id.imgShareBtn);
+        ImageView imgBackBtn = findViewById(R.id.imgBackBtn);
 
         // 이전 화면(내가 그린 코스)에서 넘겨준 코스 이름 받아오기
         String courseName = getIntent().getStringExtra("courseName");
         if (courseName != null) {
             editCourseTitle.setText(courseName);
         }
+
+        // 상단 '뒤로가기' 아이콘 클릭 시 -> 화면 종료
+        imgBackBtn.setOnClickListener(v -> finish());
 
         // 1. '경로 안내' 버튼 클릭 시 -> 경로 안내 화면으로 이동
         btnStartNavigation.setOnClickListener(v -> {

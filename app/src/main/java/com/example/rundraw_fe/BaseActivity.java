@@ -27,6 +27,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     // 각 Activity 화면 삽입
     protected void setContentLayout(int layoutResID) {
 
+        contentContainer.removeAllViews();
+
         LayoutInflater inflater = LayoutInflater.from(this);
 
         inflater.inflate(
