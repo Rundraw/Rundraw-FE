@@ -13,17 +13,28 @@
         android:gravity="center_vertical"
         android:layout_marginBottom="16dp">
 
+        <!-- 왼쪽: 뒤로 가기 아이콘 -->
+        <ImageView
+            android:id="@+id/imgBackBtn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="뒤로가기" />
+
         <!-- 공유 아이콘 -->
         <ImageView
             android:id="@+id/imgShareBtn"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_share"
-            android:layout_alignParentStart="true"
+            android:layout_toEndOf="@id/imgBackBtn"
+            android:layout_marginStart="12dp"
             android:layout_centerVertical="true"
             android:contentDescription="공유" />
 
-        <!-- 중앙 타이틀 -->
+        <!-- 중앙 타이틀 (RunDraw / 내 코스) -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -137,15 +148,14 @@
         <!-- 경로 안내 버튼 -->
         <Button
             android:id="@+id/btnStartNavigation"
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="56dp"
+            android:backgroundTint="#7CB38E"
             android:text="경로 안내"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#78A684"
-            style="?android:attr/borderlessButtonStyle" />
-
+            android:textSize="16sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>
