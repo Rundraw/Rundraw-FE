@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6F8"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- 상단 툴바 또는 타이틀 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="맛집 추가하기"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333333" />
+    </LinearLayout>
+
+    <!-- 메인 카드 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_custom_card_box_mypage"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:elevation="4dp"
+        android:layout_marginBottom="16dp">
+
+        <!-- 1. 코스 및 핑을 찍을 수 있는 지도 영역 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지도에서 위치 선택 (핑 찍기)"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="6dp" />
+
+        <FrameLayout
+            android:id="@+id/mapContainer"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:background="@drawable/bg_custom_map_box_mypage"
+            android:layout_marginBottom="20dp"
+            android:padding="8dp">
+
+            <!-- 나중에 구글 맵이나 네이버 맵 뷰가 들어갈 자리 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="📍 탭하여 핑 찍기"
+                android:textColor="#0066FF"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+        </FrameLayout>
+
+        <!-- 2. 선택된 위치 좌표/주소 표시 (선택 사항) -->
+        <TextView
+            android:id="@+id/tvSelectedLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="선택된 위치: 아직 지정되지 않았습니다."
+            android:textSize="13sp"
+            android:textColor="#888888"
+            android:layout_marginBottom="20dp" />
+
+        <!-- 3. 맛집 이름 입력 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="맛집 이름"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etRestaurantName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_custom_input_field_mypage"
+            android:hint="맛집 이름을 입력하세요"
+            android:paddingHorizontal="16dp"
+            android:textSize="14sp"
+            android:textColor="#000000"
+            android:inputType="text" />
+
+    </LinearLayout>
+
+    <!-- 하단 저장 버튼 -->
+    <Button
+        android:id="@+id/btnCompleteAddRestaurant"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="맛집 등록하기"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#78A684"
+        style="?android:attr/borderlessButtonStyle" />
+
+</LinearLayout>

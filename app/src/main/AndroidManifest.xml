@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -39,29 +39,22 @@
             </intent-filter>
         </activity>
 
-        <!-- 회원가입 화면 -->
-        <activity
-            android:name=".SignActivity"
-            android:exported="false" />
+        <!-- 주요 화면 -->
+        <activity android:name=".SignActivity" android:exported="false" />
+        <activity android:name=".HomeActivity" android:exported="false" />
+        <activity android:name=".RankingActivity" android:exported="false" />
 
-        <!-- 홈 화면 -->
-        <activity
-            android:name=".HomeActivity"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="login"
-                    android:scheme="rundraw" />
-            </intent-filter>
-        </activity>
+        <!-- 마이페이지 관련 화면 -->
+        <activity android:name=".mypage.MyPageActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageCommentsActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageCoursesActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageScrapActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageDrawnActivity" android:exported="false" />
 
-        <!-- 랭킹 화면 -->
-        <activity
-            android:name=".RankingActivity"
-            android:exported="false" />
+        <!-- 코스 설정 및 상세 화면 -->
+        <activity android:name=".mypage.CourseSettingActivity" android:exported="false" />
+        <activity android:name=".mypage.CourseDetailActivity" android:exported="false" />
+
 
         <!-- 경로 설정 진입 화면 -->
         <activity android:name=".CourseHomeActivity" android:exported="false" />

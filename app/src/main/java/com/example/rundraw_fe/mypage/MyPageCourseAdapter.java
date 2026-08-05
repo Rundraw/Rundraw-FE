@@ -19,10 +19,21 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
     public static final int MODE_COUNT = 1;       // 스크랩한 코스
     public static final int MODE_ICON = 2;        // 내가 그린 코스
 
-    private final List<? extends MyPageCourseItem> courseList;
+    private final List<String> courseList;
     private final int mode;
 
-    public MyPageCourseAdapter(List<? extends MyPageCourseItem> courseList, int mode) {
+    // 1. 클릭 리스너 인터페이스 정의
+    public interface OnItemClickListener {
+        void onItemClick(int position, String courseName);
+    }
+
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    public MyPageCourseAdapter(List<String> courseList, int mode) {
         this.courseList = courseList;
         this.mode = mode;
     }
@@ -37,22 +48,19 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        MyPageCourseItem item = courseList.get(position);
-        holder.tvCourseName.setText(item.getDisplayName());
+        String courseName = courseList.get(position);
+        holder.tvCourseName.setText(courseName);
 
         holder.statusDot.setVisibility(mode == MODE_STATUS_DOT ? View.VISIBLE : View.GONE);
         holder.tvCount.setVisibility(mode == MODE_COUNT ? View.VISIBLE : View.GONE);
         holder.ivAction.setVisibility(mode == MODE_ICON ? View.VISIBLE : View.GONE);
 
-        if (mode == MODE_STATUS_DOT) {
-            if (Boolean.TRUE.equals(item.getIsCompleted())) {
-                holder.statusDot.setBackgroundResource(R.drawable.dot_green);
+        // 2. 아이템 전체를 눌렀을 때 이벤트 전달
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(position, courseName);
             }
-        } else if (mode == MODE_COUNT) {
-            Integer count = item.getCount();
-            holder.tvCount.setText(count != null ? String.valueOf(count) : "0");
-        }
-        // MODE_ICON(내가 그린 코스)의 ivAction 아이콘 처리는 실제 공유 아이콘 리소스 확인 후 채울게요
+        });
     }
 
     @Override

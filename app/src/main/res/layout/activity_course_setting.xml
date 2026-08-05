@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6F8"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal">
+
+        <!-- 상단 타이틀 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RunDraw"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#0066FF"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 흰색 메인 카드 영역 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_custom_card_box_mypage"
+            android:padding="20dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="20dp">
+
+            <!-- 상단 지도 미리보기 영역 -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:background="@drawable/bg_custom_map_box_mypage"
+                android:layout_marginBottom="20dp"
+                android:padding="8dp">
+
+                <!-- 지도 이미지 또는 뷰 (추후 지도 연동) -->
+            </FrameLayout>
+
+            <!-- 코스 이름 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="코스 이름"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_custom_input_field_mypage"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="14dp"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/etSettingCourseName"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:text="얼굴 코스"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:inputType="text"
+                    android:layout_toStartOf="@id/tvEditName" />
+
+                <TextView
+                    android:id="@+id/tvEditName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="수정"
+                    android:textColor="#888888"
+                    android:textSize="13sp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+            </RelativeLayout>
+
+            <!-- 코스 설명 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="코스 설명"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:background="@drawable/bg_custom_input_field_mypage"
+                android:padding="12dp"
+                android:layout_marginBottom="14dp">
+
+                <EditText
+                    android:id="@+id/etSettingCourseDesc"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:hint="코스 설명을 입력하세요"
+                    android:textSize="14sp"
+                    android:textColor="#000000"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:layout_toStartOf="@id/tvEditDesc" />
+
+                <TextView
+                    android:id="@+id/tvEditDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="수정"
+                    android:textColor="#888888"
+                    android:textSize="13sp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true" />
+            </RelativeLayout>
+
+            <!-- 난이도 선택 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="난이도"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp"
+                android:weightSum="3">
+
+                <Button
+                    android:id="@+id/btnLevelHigh"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:text="상급"
+                    android:textColor="#D35400"
+                    android:backgroundTint="#FADBD8"
+                    android:layout_marginEnd="6dp"
+                    style="?android:attr/borderlessButtonStyle" />
+
+                <Button
+                    android:id="@+id/btnLevelMid"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:text="중급"
+                    android:textColor="#2980B9"
+                    android:backgroundTint="#EBF5FB"
+                    android:layout_marginEnd="6dp"
+                    style="?android:attr/borderlessButtonStyle" />
+
+                <Button
+                    android:id="@+id/btnLevelLow"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:text="하급"
+                    android:textColor="#27AE60"
+                    android:backgroundTint="#EAFAF1"
+                    style="?android:attr/borderlessButtonStyle" />
+            </LinearLayout>
+
+            <!-- 맛집 등록 영역 (시안의 두 번째 이미지 흐름 반영: 검색창 + 리스트/추가 버튼) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="맛집 등록"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="6dp" />
+
+            <!-- 맛집 검색 및 등록 박스 컨테이너 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_custom_input_field_mypage"
+                android:padding="12dp">
+
+                <!-- 맛집 검색창 (시안 2번째 이미지 참고) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_custom_card_box_mypage"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_search"
+                        android:contentDescription="검색" />
+
+                    <EditText
+                        android:id="@+id/etRestaurantSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="맛집 이름 검색 또는 입력"
+                        android:textSize="13sp"
+                        android:paddingHorizontal="8dp"
+                        android:inputType="text" />
+                </LinearLayout>
+
+                <!-- 등록된 맛집 리스트 또는 추가 영역 (시안 1, 2번째 이미지 결합) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- 등록된 맛집 아이템 예시 (OO라멘 - 삭제 버튼 '-') -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="OO라멘"
+                            android:textSize="14sp"
+                            android:textColor="#000000" />
+
+                        <!-- 맛집 삭제 버튼 (-) -->
+                        <ImageView
+                            android:id="@+id/btnRemoveRestaurant"
+                            android:layout_width="19dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="삭제"
+                            android:src="@drawable/ic_minus" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#EAEAEA"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp" />
+
+                    <!-- 맛집 추가 버튼 (+) -->
+                    <ImageView
+                        android:id="@+id/btnAddRestaurant"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_plus"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="4dp"
+                        android:contentDescription="맛집 추가" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 하단 액션 버튼들 -->
+        <Button
+            android:id="@+id/btnSaveCourse"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="경로 저장하기"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#78A684"
+            android:layout_marginBottom="10dp"
+            style="?android:attr/borderlessButtonStyle" />
+
+        <Button
+            android:id="@+id/btnDeleteCourse"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="삭제하기"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#888888"
+            style="?android:attr/borderlessButtonStyle" />
+
+    </LinearLayout>
+</ScrollView>
