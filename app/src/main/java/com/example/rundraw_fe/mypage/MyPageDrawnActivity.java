@@ -5,54 +5,73 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.rundraw_fe.BaseActivity;
 import com.example.rundraw_fe.R;
+import com.example.rundraw_fe.api.MypageApiService;
+import com.example.rundraw_fe.auth.RetrofitClient;
+import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.DraftCourseListResponse;
+import com.example.rundraw_fe.response.DraftCourseResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyPageDrawnActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-    private final List<String> courseList = new ArrayList<>();
+public class MyPageDrawnActivity extends BaseActivity {
+
+    private final List<DraftCourseResponse> courseList = new ArrayList<>();
+    private MyPageCourseAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mypage_drawn);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        setContentLayout(R.layout.activity_mypage_drawn);
 
         RecyclerView rvCourses = findViewById(R.id.rvCourses);
-        MyPageCourseAdapter adapter = new MyPageCourseAdapter(courseList, MyPageCourseAdapter.MODE_ICON);
+        adapter = new MyPageCourseAdapter(courseList, MyPageCourseAdapter.MODE_ICON);
         rvCourses.setLayoutManager(new LinearLayoutManager(this));
         rvCourses.setAdapter(adapter);
 
-        // 어댑터 아이템 클릭 시 상세 화면(CourseDetailActivity)으로 이동하도록 리스너 추가
+        // 어댑터 아이템 클릭 시 상세 화면(CourseDetailActivity)으로 이동
         adapter.setOnItemClickListener((position, courseName) -> {
             Intent intent = new Intent(MyPageDrawnActivity.this, CourseDetailActivity.class);
             intent.putExtra("courseName", courseName);
             startActivity(intent);
         });
 
-        // TODO: MypageService API 연동 - GET /mypage/drawn-courses
-        // courseList.addAll(response.getDrawnCourses());
+        loadDrawnCourses();
+        setupBottomNavigation(R.id.navigation_my);
+    }
 
-        // 서버에서 데이터를 아직 못 불렀거나 리스트가 텅 비어있을 때만 테스트용 더미 추가
-        if (courseList.isEmpty()) {
-            courseList.add("얼굴 코스 (더미)");
-            courseList.add("한강 야경 코스(더미)");
-            courseList.add("우리 동네 산책 코스(더미)");
-            courseList.add("공원 러닝 코스(더미)");
-        }
+    private void loadDrawnCourses() {
+        MypageApiService apiService = RetrofitClient.getInstance(this)
+                .create(MypageApiService.class);
 
-        adapter.notifyDataSetChanged();
+        apiService.getDrawnCourses().enqueue(new Callback<ApiResponse<DraftCourseListResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<DraftCourseListResponse>> call,
+                                   Response<ApiResponse<DraftCourseListResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    courseList.clear();
+                    // 백엔드 명세의 리스트 이름에 맞춰 호출 (예시: getDraftCourses 또는 getDrawnCourses)
+                    if (response.body().getResult() != null && response.body().getResult().getDraftCourses() != null) {
+                        courseList.addAll(response.body().getResult().getDraftCourses());
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
 
-        setupBottomNavigation();
+            @Override
+            public void onFailure(Call<ApiResponse<DraftCourseListResponse>> call, Throwable t) {
+                // 에러 처리
+            }
+        });
     }
 
     private void setupBottomNavigation() {

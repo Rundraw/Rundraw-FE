@@ -12,15 +12,15 @@ import retrofit2.http.Query;
 
 public interface MypageApiService {
 
-    @GET("/mypage/comments")
+    @GET("/api/user/me/comment")
     Call<ApiResponse<MypageCommentListResponse>> getComments();
 
-    @GET("/mypage/courses")
-    Call<ApiResponse<CourseRecordListResponse>> getCourses(@Query("type") String type);
+    @GET("/api/user/me/course")
+    Call<ApiResponse<CourseRecordListResponse>> getCourses(@Query("completedOnly") boolean completedOnly);
 
-    @GET("/mypage/scraps")
+    @GET("/api/user/me/scarppedcourse")
     Call<ApiResponse<ScrapCourseListResponse>> getScraps();
 
-    @GET("/mypage/drawn-courses")
+    @GET("/api/user/me/draft/course")
     Call<ApiResponse<DraftCourseListResponse>> getDrawnCourses();
 }
