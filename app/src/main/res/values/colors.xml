@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="share_active_green">#4CAF50</color>
+    <color name="share_inactive_gray">#AAAAAA</color>
 </resources>

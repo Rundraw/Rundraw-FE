@@ -15,6 +15,7 @@ public class CourseDetailResponse {
     private Integer bookmarkCount;
     private Boolean isBookmark;
     private Integer commentCount;
+    private Long courseDraftId;      // 체험하기 -> 네비게이션 이동 시 필요
     private List<Point> points;      // 지도 좌표 리스트
 
     public Long getCourseId() {
@@ -57,6 +58,10 @@ public class CourseDetailResponse {
 
     public Boolean getIsLike() {
         return isLike != null ? isLike : false;
+    }
+
+    public Long getCourseDraftId() {
+        return courseDraftId;
     }
 
     public Integer getBookmarkCount() {
