@@ -21,7 +21,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
-        <!-- MainActivity -->
+        <!-- 앱 시작 Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -29,6 +29,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
             <!-- OAuth Redirect -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -40,19 +41,11 @@
 
         <!-- 주요 화면 -->
         <activity android:name=".SignActivity" android:exported="false" />
-
-        <!-- 홈 화면 -->
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false">
-        </activity>
-
+        <activity android:name=".HomeActivity" android:exported="false" />
         <activity android:name=".RankingActivity" android:exported="false" />
 
-        <activity
-            android:name=".mypage.MyPageActivity"
-            android:exported="false" />
-
+        <!-- 마이페이지 관련 화면 -->
+        <activity android:name=".mypage.MyPageActivity" android:exported="false" />
         <activity android:name=".mypage.MyPageCommentsActivity" android:exported="false" />
         <activity android:name=".mypage.MyPageCoursesActivity" android:exported="false" />
         <activity android:name=".mypage.MyPageScrapActivity" android:exported="false" />
@@ -60,6 +53,7 @@
 
         <!-- 코스 설정 및 상세 화면 -->
         <activity android:name=".mypage.CourseSettingActivity" android:exported="false" />
+        <activity android:name=".mypage.MyPageCourseDetailActivity" android:exported="false" />
         <activity android:name=".mypage.CourseDetailActivity" android:exported="false" />
 
 
@@ -85,12 +79,6 @@
             android:name=".GpsArtActivity"
             android:exported="false">
         </activity>
-
-        <!-- 러닝(실시간 추적) 화면 -->
-        <activity android:name=".RunningActivity" android:exported="false" />
-
-        <!-- 기록 상세 화면 -->
-        <activity android:name=".RecordDetailActivity" android:exported="false" />
 
         <!-- 맛집 화면 -->
         <activity android:name=".RestaurantActivity" android:exported="false" />

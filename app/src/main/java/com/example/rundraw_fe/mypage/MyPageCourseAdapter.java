@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.response.CourseRecordResponse;
+import com.example.rundraw_fe.response.DraftCourseResponse;
 import com.example.rundraw_fe.response.ScrapCourseResponse;
 
 import java.util.List;
@@ -56,7 +57,9 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
             courseName = ((CourseRecordResponse) item).getCourseName();
         } else if (item instanceof ScrapCourseResponse) {
             courseName = ((ScrapCourseResponse) item).getDisplayName();
-        } else if (item != null) {
+        } else if (item instanceof DraftCourseResponse) { // 👈 이 부분을 추가해 줘야 해!
+            courseName = ((DraftCourseResponse) item).getName();
+        }else if (item != null) {
             courseName = item.toString();
         }
 

@@ -1,6 +1,7 @@
 package com.example.rundraw_fe.mypage;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,8 +12,8 @@ import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.response.ApiResponse;
-import com.example.rundraw_fe.response.MypageCommentResponse;
 import com.example.rundraw_fe.response.MypageCommentListResponse;
+import com.example.rundraw_fe.response.MypageCommentResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,15 +50,29 @@ public class MyPageCommentsActivity extends BaseActivity {
             @Override
             public void onResponse(Call<ApiResponse<MypageCommentListResponse>> call,
                                    Response<ApiResponse<MypageCommentListResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    commentList.clear();
-                    commentList.addAll(response.body().getResult().getComments());
-                    adapter.notifyDataSetChanged();
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<MypageCommentListResponse> apiResponse = response.body();
+
+                    if (apiResponse.isSuccess() && apiResponse.getResult() != null) {
+                        List<MypageCommentResponse> comments = apiResponse.getResult().getComments();
+                        if (comments != null) {
+                            commentList.clear();
+                            commentList.addAll(comments);
+                            adapter.notifyDataSetChanged();
+                            Log.d("CommentAPI", "댓글 불러오기 성공: " + comments.size() + "개");
+                        }
+                    } else {
+                        Log.e("CommentAPI", "서버 비즈니스 로직 에러 메시지: " + apiResponse.getMessage());
+                    }
+                } else {
+                    Log.e("CommentAPI", "통신 실패 코드: " + response.code());
                 }
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<MypageCommentListResponse>> call, Throwable t) {}
+            public void onFailure(Call<ApiResponse<MypageCommentListResponse>> call, Throwable t) {
+                Log.e("CommentAPI", "네트워크 에러 발생: " + t.getMessage());
+            }
         });
     }
 }

@@ -1,7 +1,5 @@
 package com.example.rundraw_fe;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,9 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.rundraw_fe.adapter.GpsArtAdapter;
 import com.example.rundraw_fe.api.RankingApi;
 import com.example.rundraw_fe.api.RestaurantApi;
 import com.example.rundraw_fe.auth.RetrofitClient;
@@ -44,6 +40,7 @@ public class HomeActivity extends BaseActivity {
     private LinearLayout sectionGpsArt;
     private RecyclerView gpsArtRecyclerView;
     private GpsArtAdapter gpsArtAdapter;
+    private LinearLayout layoutRestaurantCard;
 
 
     @Override
@@ -56,6 +53,20 @@ public class HomeActivity extends BaseActivity {
         setupSectionClickListeners();
         loadGpsArt();
         setupBottomNavigation(R.id.navigation_home);
+
+        layoutRestaurantCard.setOnClickListener(v -> {
+            Log.d("HOME", "맛집 카드 클릭");
+            Intent intent = new Intent(HomeActivity.this, RestaurantActivity.class);
+            Object tag = tvRestaurantName.getTag();
+            if(tag instanceof RestaurantResponse){
+                RestaurantResponse restaurant = (RestaurantResponse) tag;
+                intent.putExtra(
+                        "restaurantCourseId",
+                        restaurant.getRestaurantCourseId()
+                );
+            }
+            startActivity(intent);
+        });
     }
 
     private void initViews() {
@@ -68,6 +79,7 @@ public class HomeActivity extends BaseActivity {
         sectionMyRestaurant = findViewById(R.id.sectionMyRestaurant);
         sectionGpsArt = findViewById(R.id.sectionGpsArt);
         gpsArtRecyclerView = findViewById(R.id.gpsArtRecyclerView);
+        layoutRestaurantCard = findViewById(R.id.layoutRestaurantCard);
     }
 
     private void setupSectionClickListeners() {
@@ -89,25 +101,66 @@ public class HomeActivity extends BaseActivity {
     private void loadSavedRestaurant() {
         RestaurantApi apiService = RetrofitClient.getInstance(this).create(RestaurantApi.class);
 
-        apiService.getAllRestaurants().enqueue(new Callback<List<RestaurantResponse>>() {
-            @Override
-            public void onResponse(Call<List<RestaurantResponse>> call,
-                                   Response<List<RestaurantResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    RestaurantResponse restaurant = response.body().get(0); // 임시: 첫 번째 항목
+        apiService.getRestaurant().enqueue(new Callback<ApiResponse<List<RestaurantResponse>>>() {
+                    @Override
+                    public void onResponse(
+                            Call<ApiResponse<List<RestaurantResponse>>> call,
+                            Response<ApiResponse<List<RestaurantResponse>>> response
+                    ) {
 
-                    tvRestaurantName.setText(restaurant.getRestaurantName());
-                    tvRestaurantCourse.setText(
-                            restaurant.getCourseTitle() != null ? restaurant.getCourseTitle() : "코스 없음"
-                    );
-                    tvRestaurantAddress.setText(""); // TODO: 백엔드에 address 필드 추가되면 채우기
-                    tvRestaurantRating.setText("");  // TODO: 백엔드에 rating 필드 추가되면 채우기
-                }
-            }
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<RestaurantResponse> restaurantList = response.body().getResult();
 
-            @Override
-            public void onFailure(Call<List<RestaurantResponse>> call, Throwable t) {}
-        });
+                            if(restaurantList != null && !restaurantList.isEmpty()) {
+                                // 임시 첫 번째 맛집 표시
+                                RestaurantResponse restaurant = restaurantList.get(0);
+                                tvRestaurantName.setTag(restaurant);
+                                tvRestaurantName.setText(
+                                        restaurant.getRestaurantName()
+                                );
+
+
+                                tvRestaurantCourse.setText(
+                                        restaurant.getCourseName() != null
+                                                ? restaurant.getCourseName()
+                                                : "코스 없음"
+                                );
+
+
+                                // 현재 DTO에는 주소 없음
+                                tvRestaurantAddress.setText(
+                                        restaurant.getPlaceId() != null
+                                                ? restaurant.getPlaceId()
+                                                : "장소 정보 없음"
+                                );
+
+
+                                // 현재 DTO에는 평점 없음
+                                tvRestaurantRating.setText(
+                                        ""
+                                );
+
+                            }
+
+                        }
+                    }
+
+
+
+                    @Override
+                    public void onFailure(
+                            Call<ApiResponse<List<RestaurantResponse>>> call,
+                            Throwable t
+                    ) {
+
+                        Log.e(
+                                "Restaurant",
+                                t.getMessage()
+                        );
+
+                    }
+
+                });
     }
 
     private void loadGpsArt() {
