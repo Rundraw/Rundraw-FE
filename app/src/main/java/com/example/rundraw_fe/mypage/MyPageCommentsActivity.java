@@ -32,7 +32,6 @@ public class MyPageCommentsActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentLayout(R.layout.activity_mypage_comments);
-
         rvComments = findViewById(R.id.rvComments);
         adapter = new MyPageCommentAdapter(commentList);
         rvComments.setLayoutManager(new LinearLayoutManager(this));
@@ -47,32 +46,31 @@ public class MyPageCommentsActivity extends BaseActivity {
                 .create(MypageApiService.class);
 
         apiService.getComments().enqueue(new Callback<ApiResponse<MypageCommentListResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<MypageCommentListResponse>> call,
-                                   Response<ApiResponse<MypageCommentListResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<MypageCommentListResponse> apiResponse = response.body();
-
-                    if (apiResponse.isSuccess() && apiResponse.getResult() != null) {
-                        List<MypageCommentResponse> comments = apiResponse.getResult().getComments();
-                        if (comments != null) {
-                            commentList.clear();
-                            commentList.addAll(comments);
-                            adapter.notifyDataSetChanged();
-                            Log.d("CommentAPI", "댓글 불러오기 성공: " + comments.size() + "개");
+                    @Override
+                    public void onResponse(Call<ApiResponse<MypageCommentListResponse>> call, Response<ApiResponse<MypageCommentListResponse>> response) {
+                        if(response.isSuccessful() && response.body() != null) {
+                            ApiResponse<MypageCommentListResponse> apiResponse = response.body();
+                            if(apiResponse.isSuccess() && apiResponse.getResult() != null) {
+                                List<MypageCommentResponse> comments = apiResponse.getResult().getComments();
+                                if(comments != null) {
+                                    commentList.clear();
+                                    commentList.addAll(comments);
+                                    adapter.notifyDataSetChanged();
+                                    Log.d("CommentAPI", "댓글 불러오기 성공 : " + comments.size() + "개");
+                                }
+                            } else {
+                                Log.e("CommentAPI", apiResponse.getMessage());
+                            }
+                        } else {
+                            Log.e("CommentAPI", "통신 실패 코드 : " + response.code());
                         }
-                    } else {
-                        Log.e("CommentAPI", "서버 비즈니스 로직 에러 메시지: " + apiResponse.getMessage());
                     }
-                } else {
-                    Log.e("CommentAPI", "통신 실패 코드: " + response.code());
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ApiResponse<MypageCommentListResponse>> call, Throwable t) {
-                Log.e("CommentAPI", "네트워크 에러 발생: " + t.getMessage());
-            }
-        });
+                    @Override
+                    public void onFailure(Call<ApiResponse<MypageCommentListResponse>> call, Throwable t
+                    ){
+                        Log.e("CommentAPI", "네트워크 오류 : " + t.getMessage());
+                    }
+                });
     }
 }

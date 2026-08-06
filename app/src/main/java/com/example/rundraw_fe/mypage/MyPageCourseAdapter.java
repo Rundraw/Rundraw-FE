@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rundraw_fe.R;
@@ -29,10 +30,20 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
         void onItemClick(int position, String courseName);
     }
 
+    // 공유 아이콘(ivAction) 클릭 시 호출되는 리스너 (내가 그린 코스 모드 전용)
+    public interface OnShareClickListener {
+        void onShareClick(int position);
+    }
+
     private OnItemClickListener listener;
+    private OnShareClickListener shareClickListener;
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
+    }
+
+    public void setOnShareClickListener(OnShareClickListener shareClickListener) {
+        this.shareClickListener = shareClickListener;
     }
 
     public MyPageCourseAdapter(List<?> courseList, int mode) {
@@ -53,21 +64,50 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
         Object item = courseList.get(position);
         String courseName = "";
 
+
         if (item instanceof CourseRecordResponse) {
-            courseName = ((CourseRecordResponse) item).getCourseName();
+            CourseRecordResponse course = (CourseRecordResponse) item;
+            courseName = course.getCourseName();
+            // 완주 여부에 따라 점 색상 변경
+            if (Boolean.TRUE.equals(course.getIsCompleted())) {
+                // 초록색 (완주)
+                holder.statusDot.setBackgroundResource(R.drawable.dot_green);
+            } else {
+                // 빨간색 (체험)
+                holder.statusDot.setBackgroundResource(R.drawable.dot_red);
+            }
         } else if (item instanceof ScrapCourseResponse) {
             courseName = ((ScrapCourseResponse) item).getDisplayName();
-        } else if (item instanceof DraftCourseResponse) { // 👈 이 부분을 추가해 줘야 해!
+        } else if (item instanceof DraftCourseResponse) {
             courseName = ((DraftCourseResponse) item).getName();
-        }else if (item != null) {
+        } else if (item != null) {
             courseName = item.toString();
         }
-
         holder.tvCourseName.setText(courseName);
 
         holder.statusDot.setVisibility(mode == MODE_STATUS_DOT ? View.VISIBLE : View.GONE);
         holder.tvCount.setVisibility(mode == MODE_COUNT ? View.VISIBLE : View.GONE);
         holder.ivAction.setVisibility(mode == MODE_ICON ? View.VISIBLE : View.GONE);
+
+        // 내가 그린 코스 모드: 공유 아이콘 상태(tint) 반영 + 클릭 리스너 연결
+        if (mode == MODE_ICON && item instanceof DraftCourseResponse) {
+            DraftCourseResponse draft = (DraftCourseResponse) item;
+            boolean isSharing = Boolean.TRUE.equals(draft.getIsSharing());
+
+            holder.ivAction.setImageResource(R.drawable.ic_share);
+            holder.ivAction.setColorFilter(
+                    ContextCompat.getColor(
+                            holder.itemView.getContext(),
+                            isSharing ? R.color.share_active_green : R.color.share_inactive_gray
+                    )
+            );
+
+            holder.ivAction.setOnClickListener(v -> {
+                if (shareClickListener != null) {
+                    shareClickListener.onShareClick(position);
+                }
+            });
+        }
 
         String finalCourseName = courseName;
         holder.itemView.setOnClickListener(v -> {

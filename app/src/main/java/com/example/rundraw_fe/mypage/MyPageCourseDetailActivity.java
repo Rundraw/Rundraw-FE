@@ -59,7 +59,6 @@ public class MyPageCourseDetailActivity extends AppCompatActivity implements OnM
         String courseName = getIntent().getStringExtra("courseName");
 
         Log.d(TAG, "받은 courseId = " + courseId + ", courseName = " + courseName);
-        Toast.makeText(this, "courseId=" + courseId, Toast.LENGTH_LONG).show(); // 👈 임시 디버깅용, 확인 후 삭제
 
         if (courseName != null) {
             editCourseTitle.setText(courseName);
@@ -71,17 +70,25 @@ public class MyPageCourseDetailActivity extends AppCompatActivity implements OnM
             mapFragment.getMapAsync(this);
         }
 
-        loadCourseDetail();
-
         imgBackBtn.setOnClickListener(v -> finish());
         btnStartNavigation.setOnClickListener(v -> Toast.makeText(this, "경로 안내 화면으로 이동합니다.", Toast.LENGTH_SHORT).show());
+
+        // 설정 화면으로 이동 (코스 이름, 설명, 난이도 수정 등을 담당)
         imgSettingBtn.setOnClickListener(v -> {
             Intent intent = new Intent(MyPageCourseDetailActivity.this, CourseSettingActivity.class);
             intent.putExtra("courseId", courseId);
             intent.putExtra("courseName", editCourseTitle.getText().toString());
             startActivity(intent);
         });
+
         imgShareBtn.setOnClickListener(v -> Toast.makeText(this, "공유 기능", Toast.LENGTH_SHORT).show());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 설정 화면(CourseSettingActivity)에서 수정하고 돌아왔을 때 변경된 데이터를 반영하기 위해 호출
+        loadCourseDetail();
     }
 
     @Override
@@ -105,14 +112,8 @@ public class MyPageCourseDetailActivity extends AppCompatActivity implements OnM
             public void onResponse(Call<CourseApiService.CourseDetailResponse> call,
                                    Response<CourseApiService.CourseDetailResponse> response) {
                 Log.d(TAG, "API 응답 code = " + response.code());
-                Toast.makeText(MyPageCourseDetailActivity.this, "API code=" + response.code(), Toast.LENGTH_LONG).show(); // 👈 임시 디버깅용
                 if (response.isSuccessful() && response.body() != null) {
                     CourseApiService.CourseDetailResponse data = response.body();
-                    Log.d(TAG, "응답 name = " + data.getName()
-                            + ", points 개수 = " + (data.getPoints() != null ? data.getPoints().size() : "null"));
-                    Toast.makeText(MyPageCourseDetailActivity.this,
-                            "points=" + (data.getPoints() != null ? data.getPoints().size() : "null"),
-                            Toast.LENGTH_LONG).show(); // 👈 임시 디버깅용
 
                     // 코스 이름 세팅
                     if (data.getName() != null) {
@@ -143,7 +144,7 @@ public class MyPageCourseDetailActivity extends AppCompatActivity implements OnM
                         double distanceKm = totalDistanceMeters / 1000.0;
                         textCourseLength.setText(String.format(Locale.getDefault(), "%.2fkm", distanceKm));
 
-                        // 지도가 이미 준비되어 있으면 바로 그리고, 아니면 onMapReady에서 처리됨
+                        // 지도가 이미 준비되어 있으면 바로 그림
                         if (isMapReady) {
                             drawCourseLine();
                         }
@@ -174,7 +175,6 @@ public class MyPageCourseDetailActivity extends AppCompatActivity implements OnM
 
         mMap.addPolyline(polylineOptions);
 
-        // 경로 전체가 보이도록 카메라 이동 (포인트가 1개뿐이면 단순 이동)
         if (coursePoints.size() == 1) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coursePoints.get(0), 15f));
         } else {
@@ -186,7 +186,6 @@ public class MyPageCourseDetailActivity extends AppCompatActivity implements OnM
             try {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
             } catch (IllegalStateException e) {
-                // 맵 레이아웃이 아직 완전히 준비되지 않은 경우 대비
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coursePoints.get(0), 15f));
             }
         }
