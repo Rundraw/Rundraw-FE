@@ -2,89 +2,88 @@ package com.example.rundraw_fe.response;
 
 import java.util.List;
 
+
 public class CourseDetailResponse {
 
     private Long courseId;
     private String name;
-    private String user;             // 작성자
-    private Integer experienceCount;
-    private String description;      // 스웨거 기준 설명
-    private String levelTagName;     // 스웨거 기준 난이도
-    private Integer likeCount;
+    private String content;
+    private String levelType;
+    private String user;
     private Boolean isLike;
-    private Integer bookmarkCount;
     private Boolean isBookmark;
     private Integer commentCount;
-    private List<Point> points;      // 지도 좌표 리스트
+    private Integer likeCount;
+    private Integer bookmarkCount;
 
-    public Long getCourseId() {
+    // 코스 ID(PK)
+    public Long getCourseId(){
         return courseId;
     }
 
-    public String getName() {
+    // 코스 이름
+    public String getName(){
         return name;
     }
 
-    public String getUser() {
+    // 코스 부연 설명
+    public String getContent(){
+        return content;
+    }
+
+    // 난이도
+    /*
+    "BEGINNER":"초급"
+    "INTERMEDIATE":"중급"
+    "ADVANCED":"상급"
+    */
+    public String getLevelType(){
+        return levelType;
+    }
+
+    // 등록한 사용자
+    public String getUser(){
         return user;
     }
 
-    public Integer getExperienceCount() {
-        return experienceCount;
+    // 유저별 좋아요 체크(있으면 true, 없으면 false)
+    public Boolean getIsLike(){
+        return isLike;
     }
 
-    public String getDescription() {
-        return description;
+    // 유저별 북마크 체크(있으면 true, 없으면 false)
+    public Boolean getIsBookmark(){
+        return isBookmark;
     }
 
-    // 기존 코드(getContent) 호환용
-    public String getContent() {
-        return description;
+    // 댓글 수
+    public Integer getCommentCount(){
+        return commentCount;
     }
 
-    public String getLevelTagName() {
-        return levelTagName;
+    //좋아요 수
+    public Integer getLikeCount(){
+        return likeCount;
     }
 
-    // 기존 코드(getLevelType) 호환용
-    public String getLevelType() {
-        return levelTagName;
+    // 북마크 수
+    public Integer getBookmarkCount(){
+        return bookmarkCount;
     }
+    // 해당 코스 포인트 리스트
+    private List<Point> points;
 
-    public Integer getLikeCount() {
-        return likeCount != null ? likeCount : 0;
-    }
-
-    public Boolean getIsLike() {
-        return isLike != null ? isLike : false;
-    }
-
-    public Integer getBookmarkCount() {
-        return bookmarkCount != null ? bookmarkCount : 0;
-    }
-
-    public Boolean getIsBookmark() {
-        return isBookmark != null ? isBookmark : false;
-    }
-
-    public Integer getCommentCount() {
-        return commentCount != null ? commentCount : 0;
-    }
-
-    public List<Point> getPoints() {
+    public List<Point> getPoints(){
         return points;
     }
 
-    // 내부 Point 클래스 (지도 경로용)
-    public static class Point {
-        private double latitude;
-        private double longitude;
-
-        public double getLatitude() {
+    public static class Point{
+        private Double latitude;
+        private Double longitude;
+        public Double getLatitude(){
             return latitude;
         }
-
-        public double getLongitude() {
+        public Double getLongitude(){
             return longitude;
         }
     }

@@ -169,8 +169,8 @@ public class CourseSettingActivity extends AppCompatActivity {
 
                     if (data != null) {
                         Log.d("DEBUG_COURSE", "받아온 이름: " + data.getName());
-                        Log.d("DEBUG_COURSE", "받아온 description: " + data.getDescription());
-                        Log.d("DEBUG_COURSE", "받아온 levelTagName: " + data.getLevelTagName());
+                        Log.d("DEBUG_COURSE", "받아온 description: " + data.getContent());
+                        Log.d("DEBUG_COURSE", "받아온 levelTagName: " + data.getLevelType());
 
                         // 1. 기존 코스 이름 셋팅
                         if (data.getName() != null) {
@@ -178,15 +178,15 @@ public class CourseSettingActivity extends AppCompatActivity {
                         }
 
                         // 2. 기존 설명 셋팅 (서버 응답 데이터 반영)
-                        if (data.getDescription() != null && !data.getDescription().isEmpty()) {
-                            etSettingCourseDesc.setText(data.getDescription());
+                        if (data.getContent() != null && !data.getContent().isEmpty()) {
+                            etSettingCourseDesc.setText(data.getContent());
                         } else if (data.getContent() != null && !data.getContent().isEmpty()) {
                             etSettingCourseDesc.setText(data.getContent());
                         }
 
                         // 3. 기존 난이도 셋팅
-                        if (data.getLevelTagName() != null) {
-                            selectedLevel = data.getLevelTagName();
+                        if (data.getLevelType() != null) {
+                            selectedLevel = data.getLevelType();
                         } else if (data.getLevelType() != null) {
                             selectedLevel = data.getLevelType();
                         }
