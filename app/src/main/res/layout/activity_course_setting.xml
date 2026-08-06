@@ -32,15 +32,21 @@
             android:elevation="4dp"
             android:layout_marginBottom="20dp">
 
-            <!-- 상단 지도 미리보기 영역 -->
+            <!-- 상단 지도 미리보기 영역 (구글 맵 프래그먼트 추가됨) -->
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:background="@drawable/bg_custom_map_box_mypage"
+                android:layout_height="255dp"
                 android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_custom_map_box_mypage"
                 android:padding="8dp">
 
-                <!-- 지도 이미지 또는 뷰 (추후 지도 연동) -->
+                <!-- 실제 코스 지도가 표시되는 프래그먼트 -->
+                <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
             </FrameLayout>
 
             <!-- 코스 이름 -->
@@ -171,7 +177,7 @@
                     style="?android:attr/borderlessButtonStyle" />
             </LinearLayout>
 
-            <!-- 맛집 등록 영역 (시안의 두 번째 이미지 흐름 반영: 검색창 + 리스트/추가 버튼) -->
+            <!-- 맛집 등록 영역 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -188,7 +194,7 @@
                 android:background="@drawable/bg_custom_input_field_mypage"
                 android:padding="12dp">
 
-                <!-- 맛집 검색창 (시안 2번째 이미지 참고) -->
+                <!-- 맛집 검색창 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
@@ -215,13 +221,13 @@
                         android:inputType="text" />
                 </LinearLayout>
 
-                <!-- 등록된 맛집 리스트 또는 추가 영역 (시안 1, 2번째 이미지 결합) -->
+                <!-- 등록된 맛집 리스트 또는 추가 영역 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- 등록된 맛집 아이템 예시 (OO라멘 - 삭제 버튼 '-') -->
+                    <!-- 등록된 맛집 아이템 예시 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
@@ -269,28 +275,27 @@
         </LinearLayout>
 
         <!-- 하단 액션 버튼들 -->
+        <!-- 하단 액션 버튼들 -->
         <Button
             android:id="@+id/btnSaveCourse"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@drawable/bg_green_button"
             android:text="경로 저장하기"
             android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#78A684"
             android:layout_marginBottom="10dp"
             style="?android:attr/borderlessButtonStyle" />
-
         <Button
             android:id="@+id/btnDeleteCourse"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@drawable/bg_green_button"
             android:text="삭제하기"
             android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#888888"
             style="?android:attr/borderlessButtonStyle" />
-
     </LinearLayout>
 </ScrollView>
