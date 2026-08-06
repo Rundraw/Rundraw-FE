@@ -145,12 +145,12 @@
             android:paddingHorizontal="16dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- 경로 안내 버튼 -->
+        <!-- 경로 안내 버튼 (style을 제거하고 background를 입력창 배경과 동일하게 맞춘 뒤 tint 적용) -->
         <Button
             android:id="@+id/btnStartNavigation"
-            style="?android:attr/borderlessButtonStyle"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_custom_input_field_mypage"
             android:backgroundTint="#7CB38E"
             android:text="경로 안내"
             android:textColor="#FFFFFF"
