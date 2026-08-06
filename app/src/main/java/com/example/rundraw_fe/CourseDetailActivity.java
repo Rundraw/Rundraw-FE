@@ -57,7 +57,6 @@ public class CourseDetailActivity extends AppCompatActivity {
     private ImageView ivComment;
     private EditText etComment;
     private Button btnCommentSend;
-    private AppCompatButton btnStart;
     private boolean isLiked = false;
     private boolean isBookmarked = false;
     private int likeCount = 0;
@@ -71,6 +70,7 @@ public class CourseDetailActivity extends AppCompatActivity {
     private View commentInputLayout;
     private Long editingCommentId = null;
     private ImageButton btnBack;
+    private AppCompatButton btnStart;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -94,6 +94,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         etComment = findViewById(R.id.etComment);
         btnCommentSend = findViewById(R.id.btnCommentSend);
         btnBack = findViewById(R.id.btnBack);
+        btnStart = findViewById(R.id.btnStart);
 
         courseMap.onCreate(savedInstanceState);
         courseMap.getMapAsync(map -> {
@@ -380,6 +381,17 @@ public class CourseDetailActivity extends AppCompatActivity {
                         );
             }
         });
+
+        btnStart.setOnClickListener(v -> {
+            if (courseDraftId == null) {
+                Log.e("COURSE_DETAIL", "courseDraftId가 없습니다.");
+                return;
+            }
+
+            Intent intent = new Intent(CourseDetailActivity.this, NavigateActivity.class);
+            intent.putExtra("courseDraftId", courseDraftId);
+            startActivity(intent);
+        });
     }
 
     private void loadCourseDetail(){
@@ -392,6 +404,8 @@ public class CourseDetailActivity extends AppCompatActivity {
                     ) {
                         if(response.isSuccessful() && response.body()!=null){
                             CourseDetailResponse data = response.body().getResult();
+                            // courseDraftId 저장
+                            courseDraftId = data.getCoursedraftId();
                             // 제목
                             tvCourseName.setText(data.getName());
                             // 작성자

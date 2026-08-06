@@ -64,8 +64,18 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
         Object item = courseList.get(position);
         String courseName = "";
 
+
         if (item instanceof CourseRecordResponse) {
-            courseName = ((CourseRecordResponse) item).getCourseName();
+            CourseRecordResponse course = (CourseRecordResponse) item;
+            courseName = course.getCourseName();
+            // 완주 여부에 따라 점 색상 변경
+            if (Boolean.TRUE.equals(course.getIsCompleted())) {
+                // 초록색 (완주)
+                holder.statusDot.setBackgroundResource(R.drawable.dot_green);
+            } else {
+                // 빨간색 (체험)
+                holder.statusDot.setBackgroundResource(R.drawable.dot_red);
+            }
         } else if (item instanceof ScrapCourseResponse) {
             courseName = ((ScrapCourseResponse) item).getDisplayName();
         } else if (item instanceof DraftCourseResponse) {
@@ -73,7 +83,6 @@ public class MyPageCourseAdapter extends RecyclerView.Adapter<MyPageCourseAdapte
         } else if (item != null) {
             courseName = item.toString();
         }
-
         holder.tvCourseName.setText(courseName);
 
         holder.statusDot.setVisibility(mode == MODE_STATUS_DOT ? View.VISIBLE : View.GONE);
