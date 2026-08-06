@@ -57,7 +57,6 @@ public class CourseDetailActivity extends AppCompatActivity {
     private ImageView ivComment;
     private EditText etComment;
     private Button btnCommentSend;
-    private AppCompatButton btnStart;
     private boolean isLiked = false;
     private boolean isBookmarked = false;
     private int likeCount = 0;
@@ -72,7 +71,6 @@ public class CourseDetailActivity extends AppCompatActivity {
     private Long editingCommentId = null;
     private ImageButton btnBack;
     private AppCompatButton btnStart;
-    private Long courseDraftId;
 
     @SuppressLint("MissingInflatedId")
     @Override
