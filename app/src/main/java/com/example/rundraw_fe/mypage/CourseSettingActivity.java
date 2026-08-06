@@ -196,21 +196,27 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
                     CourseDetailResponse data = response.body().getResult();
 
                     if (data != null) {
-                        // 1. 코스 이름 세팅
+                        Log.d("DEBUG_COURSE", "받아온 이름: " + data.getName());
+                        Log.d("DEBUG_COURSE", "받아온 description: " + data.getContent());
+                        Log.d("DEBUG_COURSE", "받아온 levelTagName: " + data.getLevelType());
+
+                        // 1. 기존 코스 이름 셋팅
                         if (data.getName() != null) {
                             etSettingCourseName.setText(data.getName());
                         }
 
-                        // 2. 코스 설명 세팅 (CourseDetailResponse의 getDescription() 활용)
-                        if (data.getDescription() != null && !data.getDescription().isEmpty()) {
-                            etSettingCourseDesc.setText(data.getDescription());
+                        // 2. 기존 설명 셋팅 (서버 응답 데이터 반영)
+                        if (data.getContent() != null && !data.getContent().isEmpty()) {
+                            etSettingCourseDesc.setText(data.getContent());
                         } else if (data.getContent() != null && !data.getContent().isEmpty()) {
                             etSettingCourseDesc.setText(data.getContent());
                         }
 
-                        // 3. 난이도 세팅
-                        if (data.getLevelTagName() != null) {
-                            selectedLevel = data.getLevelTagName();
+                        // 3. 기존 난이도 셋팅
+                        if (data.getLevelType() != null) {
+                            selectedLevel = data.getLevelType();
+                        } else if (data.getLevelType() != null) {
+                            selectedLevel = data.getLevelType();
                         }
 
                         // 4. 포인트 좌표들을 이용해 지도 선 세팅 (CourseDetailResponse.Point 활용)

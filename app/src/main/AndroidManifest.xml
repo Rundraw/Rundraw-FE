@@ -56,7 +56,6 @@
         <activity android:name=".mypage.CourseSettingActivity" android:exported="false" />
         <!-- TODO: 실제 사용 여부 및 진행 상황 팀원과 재확인 -->
         <activity android:name=".mypage.MyPageCourseDetailActivity" android:exported="false" />
-        <activity android:name=".mypage.CourseDetailActivity" android:exported="false" />
 
         <!-- 경로 설정 진입 화면 -->
         <activity android:name=".CourseHomeActivity" android:exported="false" />

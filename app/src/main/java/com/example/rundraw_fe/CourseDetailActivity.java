@@ -432,26 +432,23 @@ public class CourseDetailActivity extends AppCompatActivity {
                             Call<ApiResponse<CourseDetailResponse>> call,
                             Throwable t
                     ){}
+                    private String getLevelText(String levelType) {
+                        if (levelType == null) {
+                            return "";
+                        }
+                        switch (levelType) {
+                            case "BEGINNER":
+                                return "초급";
+                            case "INTERMEDIATE":
+                                return "중급";
+                            case "ADVANCED":
+                                return "상급";
+                            default:
+                                return levelType;
+                        }
+                    }
                 });
     }
-
-    // 📌 getLevelText 메소드를 올바른 위치(액티비티 클래스 내부)로 이동
-    private String getLevelText(String levelType) {
-        if (levelType == null) {
-            return "";
-        }
-        switch (levelType) {
-            case "BEGINNER":
-                return "초급";
-            case "INTERMEDIATE":
-                return "중급";
-            case "ADVANCED":
-                return "상급";
-            default:
-                return levelType;
-        }
-    }
-
     private void drawCourseRoute(
             List<CourseDetailResponse.Point> points
     ){
