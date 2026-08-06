@@ -1,4 +1,3 @@
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -28,6 +27,8 @@ android {
         // 변수 설정
         buildConfigField "String", "OAUTH_URL", "\"${properties.getProperty("OAUTH_URL")}\""
         buildConfigField "String", "LOCAL_URL", "\"${properties.getProperty("LOCAL_URL")}\""
+        // local.properties에서 MAPS_API_KEY를 읽어와 AndroidManifest에서 쓸 수 있게 manifestPlaceholders로 등록
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
         manifestPlaceholders = [MAPS_API_KEY: properties.getProperty("MAPS_API_KEY")]
     }
 
@@ -47,7 +48,6 @@ android {
 }
 
 dependencies {
-
     implementation libs.appcompat
     implementation libs.core.ktx
     implementation libs.material
