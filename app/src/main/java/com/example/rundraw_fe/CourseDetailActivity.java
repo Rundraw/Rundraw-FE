@@ -13,7 +13,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rundraw_fe.api.RankingApi;
@@ -40,7 +42,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CourseDetailActivity extends AppCompatActivity {
-    
+
     private ImageView ivLike;
     private ImageView ivBookmark;
     private TextView tvLikeCount;
@@ -55,19 +57,21 @@ public class CourseDetailActivity extends AppCompatActivity {
     private ImageView ivComment;
     private EditText etComment;
     private Button btnCommentSend;
+    private AppCompatButton btnStart;
     private boolean isLiked = false;
     private boolean isBookmarked = false;
     private int likeCount = 0;
     private int bookmarkCount = 0;
     private RankingApi apiService;
     private Long courseId;
+    private Long courseDraftId;
     private BottomSheetBehavior commentBehavior;
     private CommentAdapter commentAdapter;
     private RecyclerView commentRecyclerView;
     private View commentInputLayout;
     private Long editingCommentId = null;
     private ImageButton btnBack;
-    
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +94,8 @@ public class CourseDetailActivity extends AppCompatActivity {
         etComment = findViewById(R.id.etComment);
         btnCommentSend = findViewById(R.id.btnCommentSend);
         btnBack = findViewById(R.id.btnBack);
-        
+        btnStart = findViewById(R.id.btnStart);
+
         courseMap.onCreate(savedInstanceState);
         courseMap.getMapAsync(map -> {
             googleMap = map;
@@ -98,7 +103,7 @@ public class CourseDetailActivity extends AppCompatActivity {
             googleMap.getUiSettings().setZoomGesturesEnabled(false);
         });
         commentRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        
+
         commentAdapter = new CommentAdapter(
                 new CommentMenuListener() {
                     @Override
@@ -131,11 +136,11 @@ public class CourseDetailActivity extends AppCompatActivity {
                                             Throwable t
                                     ) {}
                                 });
-                            }
-                        }
-                );
+                    }
+                }
+        );
         commentRecyclerView.setAdapter(commentAdapter);
-        
+
         // 전달 받은 courseId
         courseId = getIntent().getLongExtra("courseId", 0L);
         Log.d("COURSE_DETAIL", "courseId = " + courseId);
@@ -177,6 +182,17 @@ public class CourseDetailActivity extends AppCompatActivity {
         // 뒤로 가기
         btnBack.setOnClickListener(v -> {
             finish();
+        });
+
+        // 체험하기 버튼 -> 네비게이션 화면 이동
+        btnStart.setOnClickListener(v -> {
+            if (courseDraftId == null) {
+                Toast.makeText(this, "코스 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(CourseDetailActivity.this, NavigateActivity.class);
+            intent.putExtra("courseDraftId", courseDraftId);
+            startActivity(intent);
         });
 
         // 댓글 조회 버튼 클릭 이벤트
@@ -370,53 +386,55 @@ public class CourseDetailActivity extends AppCompatActivity {
     private void loadCourseDetail(){
         apiService.getCourseDetail(courseId)
                 .enqueue(new Callback<ApiResponse<CourseDetailResponse>>() {
-                            @Override
-                            public void onResponse(
-                                    Call<ApiResponse<CourseDetailResponse>> call,
-                                    Response<ApiResponse<CourseDetailResponse>> response
-                            ) {
-                                if(response.isSuccessful() && response.body()!=null){
-                                    CourseDetailResponse data = response.body().getResult();
-                                    // 제목
-                                    tvCourseName.setText(data.getName());
-                                    // 작성자
-                                    tvWriter.setText(data.getUser());
-                                    // 난이도
-                                    tvLevel.setText(getLevelText(data.getLevelType()));
-                                    // 설명
-                                    tvDescription.setText(data.getContent());
-                                    // 좋아요
-                                    likeCount = data.getLikeCount();
-                                    tvLikeCount.setText(String.valueOf(likeCount));
-                                    isLiked = Boolean.TRUE.equals(data.getIsLike());
-                                    if(isLiked){
-                                        ivLike.setImageResource(R.drawable.ic_heart_full);
-                                    }else{
-                                        ivLike.setImageResource(R.drawable.ic_heart_empty);
-                                    }
-                                    // 북마크
-                                    bookmarkCount = data.getBookmarkCount();
-                                    tvBookmarkCount.setText(String.valueOf(bookmarkCount));
-                                    isBookmarked = Boolean.TRUE.equals(data.getIsBookmark());
-                                    if(isBookmarked){
-                                        ivBookmark.setImageResource(R.drawable.ic_bookmark_full);
-                                    }else{
-                                        ivBookmark.setImageResource(R.drawable.ic_bookmark_empty);
-                                    }
-                                    // 댓글
-                                    tvCommentCount.setText(String.valueOf(data.getCommentCount()));
-                                    // 지도 경로 표시
-                                    if(data.getPoints() != null && !data.getPoints().isEmpty()){
-                                        drawCourseRoute(data.getPoints());
-                                    }
-                                }
+                    @Override
+                    public void onResponse(
+                            Call<ApiResponse<CourseDetailResponse>> call,
+                            Response<ApiResponse<CourseDetailResponse>> response
+                    ) {
+                        if(response.isSuccessful() && response.body()!=null){
+                            CourseDetailResponse data = response.body().getResult();
+                            // 체험하기 이동에 필요한 draft ID 저장
+                            courseDraftId = data.getCourseDraftId();
+                            // 제목
+                            tvCourseName.setText(data.getName());
+                            // 작성자
+                            tvWriter.setText(data.getUser());
+                            // 난이도
+                            tvLevel.setText(getLevelText(data.getLevelType()));
+                            // 설명
+                            tvDescription.setText(data.getContent());
+                            // 좋아요
+                            likeCount = data.getLikeCount();
+                            tvLikeCount.setText(String.valueOf(likeCount));
+                            isLiked = Boolean.TRUE.equals(data.getIsLike());
+                            if(isLiked){
+                                ivLike.setImageResource(R.drawable.ic_heart_full);
+                            }else{
+                                ivLike.setImageResource(R.drawable.ic_heart_empty);
                             }
+                            // 북마크
+                            bookmarkCount = data.getBookmarkCount();
+                            tvBookmarkCount.setText(String.valueOf(bookmarkCount));
+                            isBookmarked = Boolean.TRUE.equals(data.getIsBookmark());
+                            if(isBookmarked){
+                                ivBookmark.setImageResource(R.drawable.ic_bookmark_full);
+                            }else{
+                                ivBookmark.setImageResource(R.drawable.ic_bookmark_empty);
+                            }
+                            // 댓글
+                            tvCommentCount.setText(String.valueOf(data.getCommentCount()));
+                            // 지도 경로 표시
+                            if(data.getPoints() != null && !data.getPoints().isEmpty()){
+                                drawCourseRoute(data.getPoints());
+                            }
+                        }
+                    }
 
-                            @Override
-                            public void onFailure(
-                                    Call<ApiResponse<CourseDetailResponse>> call,
-                                    Throwable t
-                            ){}
+                    @Override
+                    public void onFailure(
+                            Call<ApiResponse<CourseDetailResponse>> call,
+                            Throwable t
+                    ){}
                     private String getLevelText(String levelType) {
                         if (levelType == null) {
                             return "";
@@ -516,11 +534,11 @@ public class CourseDetailActivity extends AppCompatActivity {
                             PaginationResponse<CommentResponse> result = response.body().getResult();
                             for(CommentResponse comment : result.getData()){
                                 Log.d("COMMENT_CHECK", "id="
-                                                + comment.getId()
-                                                + ", content="
-                                                + comment.getContent()
-                                                + ", isMine="
-                                                + comment.getIsMine()
+                                        + comment.getId()
+                                        + ", content="
+                                        + comment.getContent()
+                                        + ", isMine="
+                                        + comment.getIsMine()
                                 );
                             }
                             Log.d("COMMENT", "댓글 개수 : " + result.getData().size());

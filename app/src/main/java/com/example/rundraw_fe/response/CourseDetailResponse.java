@@ -15,6 +15,7 @@ public class CourseDetailResponse {
     private Integer commentCount;
     private Integer likeCount;
     private Integer bookmarkCount;
+    private Long courseDraftId;
 
     public Long getCourseId(){
         return courseId;
@@ -55,6 +56,11 @@ public class CourseDetailResponse {
     public Integer getBookmarkCount(){
         return bookmarkCount;
     }
+
+    public Long getCourseDraftId(){
+        return courseDraftId;
+    }
+
     private List<Point> points;
 
     public List<Point> getPoints(){
