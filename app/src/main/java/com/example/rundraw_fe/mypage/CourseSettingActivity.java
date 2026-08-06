@@ -10,41 +10,62 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rundraw_fe.R;
-import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.api.RankingApi;
+import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.request.CourseSettingReqDTO;
 import com.example.rundraw_fe.response.ApiResponse;
 import com.example.rundraw_fe.response.CourseDetailResponse;
 
+// 구글 맵 관련 임포트
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CourseSettingActivity extends AppCompatActivity {
+public class CourseSettingActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private static final String TAG = "COURSE_SETTING";
 
     private EditText etSettingCourseName, etSettingCourseDesc, etRestaurantSearch;
-    private TextView tvEditName, tvEditDesc; // 수정 버튼 텍스트뷰 추가
+    private TextView tvEditName, tvEditDesc;
     private Button btnLevelHigh, btnLevelMid, btnLevelLow, btnSaveCourse, btnDeleteCourse;
     private ImageView btnAddRestaurant, btnRemoveRestaurant;
 
     private long courseId = 1L;
     private String selectedLevel = "INTERMEDIATE";
 
+    // 지도 관련 변수
+    private GoogleMap mMap;
+    private boolean isMapReady = false;
+    private final List<LatLng> coursePoints = new ArrayList<>();
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // 👇 액티비티가 실행될 때 로그가 찍히는지 확인하기 위한 코드 추가
-        Log.d("COURSE_SETTING", "CourseSettingActivity가 실행되었습니다!");
+        Log.d(TAG, "CourseSettingActivity가 실행되었습니다!");
 
         setContentView(R.layout.activity_course_setting);
 
-        // 뷰 초기화
+        // 1. 이전 화면에서 courseId 받기
+        courseId = getIntent().getLongExtra("courseId", 1L);
+        Log.d(TAG, "전달받은 courseId = " + courseId);
+
+        // 2. 뷰 초기화
         etSettingCourseName = findViewById(R.id.etSettingCourseName);
         etSettingCourseDesc = findViewById(R.id.etSettingCourseDesc);
         etRestaurantSearch = findViewById(R.id.etRestaurantSearch);
@@ -60,27 +81,40 @@ public class CourseSettingActivity extends AppCompatActivity {
         btnAddRestaurant = findViewById(R.id.btnAddRestaurant);
         btnRemoveRestaurant = findViewById(R.id.btnRemoveRestaurant);
 
-        // 0. 처음에는 수정 못 하도록 EditText 잠그기 (읽기 전용 상태)
+        // 3. 처음에는 수정 못 하도록 EditText 잠그기 (읽기 전용 상태)
         setEditable(etSettingCourseName, false);
         setEditable(etSettingCourseDesc, false);
 
-        // '코스 이름' 수정 버튼 클릭 시
+        // '코스 이름' 수정/완료 토글 버튼 클릭 시
         tvEditName.setOnClickListener(v -> {
-            setEditable(etSettingCourseName, true);
-            tvEditName.setText("완료");
+            if (etSettingCourseName.isEnabled()) {
+                setEditable(etSettingCourseName, false);
+                tvEditName.setText("수정");
+            } else {
+                setEditable(etSettingCourseName, true);
+                tvEditName.setText("완료");
+            }
         });
 
-        // '코스 설명' 수정 버튼 클릭 시
+        // '코스 설명' 수정/완료 토글 버튼 클릭 시
         tvEditDesc.setOnClickListener(v -> {
-            setEditable(etSettingCourseDesc, true);
-            tvEditDesc.setText("완료");
+            if (etSettingCourseDesc.isEnabled()) {
+                setEditable(etSettingCourseDesc, false);
+                tvEditDesc.setText("수정");
+            } else {
+                setEditable(etSettingCourseDesc, true);
+                tvEditDesc.setText("완료");
+            }
         });
 
-        // 1. 이전 화면에서 courseId 받기
-        courseId = getIntent().getLongExtra("courseId", 1L);
-        Log.d("COURSE_SETTING", "전달받은 courseId = " + courseId);
+        // 4. 지도 프래그먼트 연동
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
-        // 2. 서버에서 기존 코스 정보 불러오기 (이때 기존 설명과 이름이 박스에 셋팅됨)
+        // 5. 서버에서 기존 코스 정보(이름, 설명, 포인트 좌표) 불러오기
         loadExistingCourseData();
 
         // 난이도 버튼 클릭 이벤트
@@ -135,35 +169,29 @@ public class CourseSettingActivity extends AppCompatActivity {
             Toast.makeText(this, "코스가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
             finish();
         });
+    }
 
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        mMap = googleMap;
+        isMapReady = true;
+        drawCourseLine();
     }
 
     /**
-     * EditText 활성화/비활성화 및 키보드 제어 함수
-     */
-    private void setEditable(EditText editText, boolean enabled) {
-        editText.setEnabled(enabled);
-        editText.setFocusable(enabled);
-        editText.setFocusableInTouchMode(enabled);
-        if (enabled) {
-            editText.requestFocus();
-            // 커서를 문장 맨 끝으로 이동
-            editText.setSelection(editText.getText().length());
-            // 키보드 올리기
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-        }
-    }
-
-    /**
-     * 서버에서 기존 코스 정보를 GET으로 불러와서 이름, 설명, 난이도를 꽂아주는 함수
+     * 서버에서 기존 코스 정보를 RankingApi와 제공된 CourseDetailResponse 구조에 맞게 불러와서 셋팅
      */
     private void loadExistingCourseData() {
+        Log.d(TAG, "loadExistingCourseData() 호출됨, courseId = " + courseId);
+        if (courseId == 0L) return;
+
         RankingApi rankingApi = RetrofitClient.getInstance(this).create(RankingApi.class);
 
         rankingApi.getCourseDetail(courseId).enqueue(new Callback<ApiResponse<CourseDetailResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<CourseDetailResponse>> call, Response<ApiResponse<CourseDetailResponse>> response) {
+            public void onResponse(Call<ApiResponse<CourseDetailResponse>> call,
+                                   Response<ApiResponse<CourseDetailResponse>> response) {
+                Log.d(TAG, "API 응답 code = " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     CourseDetailResponse data = response.body().getResult();
 
@@ -191,17 +219,77 @@ public class CourseSettingActivity extends AppCompatActivity {
                             selectedLevel = data.getLevelType();
                         }
 
-                        Log.d("COURSE_SETTING", "기존 데이터 불러오기 성공: " + data.getName());
+                        // 4. 포인트 좌표들을 이용해 지도 선 세팅 (CourseDetailResponse.Point 활용)
+                        List<CourseDetailResponse.Point> points = data.getPoints();
+                        if (points != null && !points.isEmpty()) {
+                            coursePoints.clear();
+                            for (int i = 0; i < points.size(); i++) {
+                                CourseDetailResponse.Point point = points.get(i);
+                                coursePoints.add(new LatLng(point.getLatitude(), point.getLongitude()));
+                            }
+
+                            if (isMapReady) {
+                                drawCourseLine();
+                            }
+                        } else {
+                            Log.w(TAG, "포인트 데이터가 비어있습니다.");
+                        }
                     }
                 } else {
-                    Log.e("COURSE_SETTING", "기존 데이터 불러오기 실패 코드: " + response.code());
+                    Log.e(TAG, "상세 정보 불러오기 실패: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<CourseDetailResponse>> call, Throwable t) {
-                Log.e("COURSE_SETTING", "기존 데이터 불러오기 네트워크 오류", t);
+                Log.e(TAG, "상세 정보 네트워크 오류", t);
             }
         });
+    }
+
+    /**
+     * 지도에 코스 경로 선(Polyline)을 그려주는 함수
+     */
+    private void drawCourseLine() {
+        if (mMap == null || coursePoints.isEmpty()) return;
+
+        mMap.clear();
+
+        PolylineOptions polylineOptions = new PolylineOptions()
+                .addAll(coursePoints)
+                .width(12f)
+                .color(getResources().getColor(android.R.color.holo_blue_dark));
+
+        mMap.addPolyline(polylineOptions);
+
+        if (coursePoints.size() == 1) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coursePoints.get(0), 15f));
+        } else {
+            com.google.android.gms.maps.model.LatLngBounds.Builder boundsBuilder =
+                    new com.google.android.gms.maps.model.LatLngBounds.Builder();
+            for (LatLng point : coursePoints) {
+                boundsBuilder.include(point);
+            }
+            try {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100));
+            } catch (IllegalStateException e) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coursePoints.get(0), 15f));
+            }
+        }
+    }
+
+    /**
+     * EditText 활성화/비활성화 및 키보드 제어 함수
+     */
+    private void setEditable(EditText editText, boolean enabled) {
+        editText.setEnabled(enabled);
+        editText.setFocusable(enabled);
+        editText.setFocusableInTouchMode(enabled);
+        if (enabled) {
+            editText.requestFocus();
+            editText.setSelection(editText.getText().length());
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 }

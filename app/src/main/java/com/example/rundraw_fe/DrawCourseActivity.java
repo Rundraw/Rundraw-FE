@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -88,8 +89,10 @@ public class DrawCourseActivity extends BaseActivity implements OnMapReadyCallba
             api.saveDraft(request).enqueue(new Callback<DraftDetailResponse>() {
                 @Override
                 public void onResponse(Call<DraftDetailResponse> call, Response<DraftDetailResponse> response) {
+                    Log.d("DrawCourseActivity", "저장 응답 코드: " + response.code() + ", 성공여부: " + response.isSuccessful());
                     if (response.isSuccessful() && response.body() != null) {
                         Long savedCourseDraftId = response.body().getCourseDraftId();
+                        Log.d("DrawCourseActivity", "저장된 courseDraftId: " + savedCourseDraftId);
 
                         new AlertDialog.Builder(DrawCourseActivity.this)
                                 .setMessage("경로 저장을 완료했습니다.")

@@ -79,7 +79,7 @@ public class NavigateActivity extends AppCompatActivity implements OnMapReadyCal
             Log.d(TAG, "경로 안내 시작 버튼 클릭됨!");
             Toast.makeText(this, "경로 안내를 시작합니다. (Course ID: " + courseDraftId + ")", Toast.LENGTH_SHORT).show();
 
-            // TODO: 나중에 RunningActivity로 화면 전환 코드가 필요하다면 여기에 추가하면 돼!
+
             Intent intent = new Intent(NavigateActivity.this, RunningActivity.class);
             intent.putExtra("courseDraftId", courseDraftId);
             startActivity(intent);
