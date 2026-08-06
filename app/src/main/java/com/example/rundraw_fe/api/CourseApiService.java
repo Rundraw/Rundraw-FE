@@ -25,7 +25,7 @@ public interface CourseApiService {
 
     // 3. 코스 기록 일시정지
     @POST("/api/user/me/course/record/{recordId}/pause")
-    Call<Void> pauseRecord(@Path("recordId") Long recordId, @Body PointRequest request);
+    Call<Void> pauseRecord(@Path("recordId") Long recordId, @Body PauseRequest request);
 
     // 4. 코스 기록 재개
     @PATCH("/api/user/me/course/record/{recordId}/resume")
@@ -127,6 +127,7 @@ public interface CourseApiService {
         private boolean isCompleted;
         private double distanceKm;
         private int durationSec;
+        private List<FinishPointDto> points;
 
         public double getDistanceKm() {
             return distanceKm;
@@ -137,8 +138,32 @@ public interface CourseApiService {
         public boolean isCompleted() {
             return isCompleted;
         }
+        public List<FinishPointDto> getPoints() { return points; }
     }
 
+    // pause 전용 요청 DTO
+    class PauseRequest {
+        private Long recordId;
+        private double latitude;
+        private double longitude;
+
+        public PauseRequest(Long recordId, double latitude, double longitude) {
+            this.recordId = recordId;
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+    }
+    class FinishPointDto {
+        private int sequence;
+        private double latitude;
+        private double longitude;
+        private String recordedAt;
+
+        public double getLatitude() { return latitude; }
+        public double getLongitude() { return longitude; }
+        public int getSequence() { return sequence; }
+        public String getRecordedAt() { return recordedAt; }
+    }
     class CourseSummaryDto {
         private Long courseId;
         private String name;
