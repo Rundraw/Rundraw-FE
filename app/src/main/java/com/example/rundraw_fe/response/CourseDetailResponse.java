@@ -15,6 +15,7 @@ public class CourseDetailResponse {
     private Integer commentCount;
     private Integer likeCount;
     private Integer bookmarkCount;
+    private Long coursedraftId;
 
     // 코스 ID(PK)
     public Long getCourseId(){
@@ -69,6 +70,11 @@ public class CourseDetailResponse {
     // 북마크 수
     public Integer getBookmarkCount(){
         return bookmarkCount;
+    }
+
+    //coursedraftId
+    public Long getCoursedraftId(){
+        return coursedraftId;
     }
     // 해당 코스 포인트 리스트
     private List<Point> points;

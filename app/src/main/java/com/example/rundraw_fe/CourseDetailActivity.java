@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rundraw_fe.api.RankingApi;
@@ -67,6 +68,8 @@ public class CourseDetailActivity extends AppCompatActivity {
     private View commentInputLayout;
     private Long editingCommentId = null;
     private ImageButton btnBack;
+    private AppCompatButton btnStart;
+    private Long courseDraftId;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -90,6 +93,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         etComment = findViewById(R.id.etComment);
         btnCommentSend = findViewById(R.id.btnCommentSend);
         btnBack = findViewById(R.id.btnBack);
+        btnStart = findViewById(R.id.btnStart);
 
         courseMap.onCreate(savedInstanceState);
         courseMap.getMapAsync(map -> {
@@ -365,6 +369,17 @@ public class CourseDetailActivity extends AppCompatActivity {
                         );
             }
         });
+
+        btnStart.setOnClickListener(v -> {
+            if (courseDraftId == null) {
+                Log.e("COURSE_DETAIL", "courseDraftId가 없습니다.");
+                return;
+            }
+
+            Intent intent = new Intent(CourseDetailActivity.this, NavigateActivity.class);
+            intent.putExtra("courseDraftId", courseDraftId);
+            startActivity(intent);
+        });
     }
 
     private void loadCourseDetail(){
@@ -377,6 +392,8 @@ public class CourseDetailActivity extends AppCompatActivity {
                     ) {
                         if(response.isSuccessful() && response.body()!=null){
                             CourseDetailResponse data = response.body().getResult();
+                            // courseDraftId 저장
+                            courseDraftId = data.getCoursedraftId();
                             // 제목
                             tvCourseName.setText(data.getName());
                             // 작성자
