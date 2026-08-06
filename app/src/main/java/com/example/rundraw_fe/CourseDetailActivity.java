@@ -94,7 +94,6 @@ public class CourseDetailActivity extends AppCompatActivity {
         etComment = findViewById(R.id.etComment);
         btnCommentSend = findViewById(R.id.btnCommentSend);
         btnBack = findViewById(R.id.btnBack);
-        btnStart = findViewById(R.id.btnStart);
 
         courseMap.onCreate(savedInstanceState);
         courseMap.getMapAsync(map -> {
@@ -393,8 +392,6 @@ public class CourseDetailActivity extends AppCompatActivity {
                     ) {
                         if(response.isSuccessful() && response.body()!=null){
                             CourseDetailResponse data = response.body().getResult();
-                            // 체험하기 이동에 필요한 draft ID 저장
-                            courseDraftId = data.getCourseDraftId();
                             // 제목
                             tvCourseName.setText(data.getName());
                             // 작성자
@@ -435,23 +432,26 @@ public class CourseDetailActivity extends AppCompatActivity {
                             Call<ApiResponse<CourseDetailResponse>> call,
                             Throwable t
                     ){}
-                    private String getLevelText(String levelType) {
-                        if (levelType == null) {
-                            return "";
-                        }
-                        switch (levelType) {
-                            case "BEGINNER":
-                                return "초급";
-                            case "INTERMEDIATE":
-                                return "중급";
-                            case "ADVANCED":
-                                return "상급";
-                            default:
-                                return levelType;
-                        }
-                    }
                 });
     }
+
+    // 📌 getLevelText 메소드를 올바른 위치(액티비티 클래스 내부)로 이동
+    private String getLevelText(String levelType) {
+        if (levelType == null) {
+            return "";
+        }
+        switch (levelType) {
+            case "BEGINNER":
+                return "초급";
+            case "INTERMEDIATE":
+                return "중급";
+            case "ADVANCED":
+                return "상급";
+            default:
+                return levelType;
+        }
+    }
+
     private void drawCourseRoute(
             List<CourseDetailResponse.Point> points
     ){

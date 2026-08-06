@@ -1,11 +1,16 @@
 package com.example.rundraw_fe.api;
 
+import com.example.rundraw_fe.request.CourseSettingReqDTO;
 import com.example.rundraw_fe.response.ApiResponse;
 import com.example.rundraw_fe.response.CourseRecordListResponse;
 import com.example.rundraw_fe.response.DraftCourseListResponse;
+import com.example.rundraw_fe.response.DraftCourseResponse;
 import com.example.rundraw_fe.response.MypageCommentListResponse;
 import com.example.rundraw_fe.response.ScrapCourseListResponse;
 
+import retrofit2.http.Body;
+import retrofit2.http.PATCH;
+import retrofit2.http.Path;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
@@ -29,4 +34,13 @@ public interface MypageApiService {
     // 그린 코스 공유 상태 토글 (백엔드 경로: draft/courses, 복수형)
     @PATCH("api/mypage/draft/courses/{draftCourseId}/share")
     Call<ApiResponse<Object>> toggleDraftSharing(@Path("draftCourseId") Long draftCourseId);
+    // 코스 수정 API 연동
+    @PATCH("api/course/{courseId}")
+    Call<Void> updateCourse(
+            @Path("courseId") long courseId,
+            @Body CourseSettingReqDTO request
+    );
+
+    @GET("api/course/draft/{courseDraftId}")
+    Call<ApiResponse<DraftCourseResponse>> getDraftCourseDetail(@Path("courseDraftId") Long courseDraftId);
 }

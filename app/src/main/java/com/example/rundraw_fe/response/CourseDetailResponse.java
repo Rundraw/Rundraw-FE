@@ -2,78 +2,94 @@ package com.example.rundraw_fe.response;
 
 import java.util.List;
 
-
 public class CourseDetailResponse {
 
     private Long courseId;
     private String name;
-    private String content;
-    private String levelType;
-    private String user;
+    private String user;             // 작성자
+    private Integer experienceCount;
+    private String description;      // 스웨거 기준 설명
+    private String levelTagName;     // 스웨거 기준 난이도
+    private Integer likeCount;
     private Boolean isLike;
+    private Integer bookmarkCount;
     private Boolean isBookmark;
     private Integer commentCount;
-    private Integer likeCount;
-    private Integer bookmarkCount;
-    private Long courseDraftId;
+    private Long courseDraftId;      // 체험하기 -> 네비게이션 이동 시 필요
+    private List<Point> points;      // 지도 좌표 리스트
 
-    public Long getCourseId(){
+    public Long getCourseId() {
         return courseId;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public String getContent(){
-        return content;
-    }
-
-    public String getLevelType(){
-        return levelType;
-    }
-
-    public String getUser(){
+    public String getUser() {
         return user;
     }
 
-    public Boolean getIsLike(){
-        return isLike;
+    public Integer getExperienceCount() {
+        return experienceCount;
     }
 
-    public Boolean getIsBookmark(){
-        return isBookmark;
+    public String getDescription() {
+        return description;
     }
 
-    public Integer getCommentCount(){
-        return commentCount;
+    // 기존 코드(getContent) 호환용
+    public String getContent() {
+        return description;
     }
 
-    public Integer getLikeCount(){
-        return likeCount;
+    public String getLevelTagName() {
+        return levelTagName;
     }
 
-    public Integer getBookmarkCount(){
-        return bookmarkCount;
+    // 기존 코드(getLevelType) 호환용
+    public String getLevelType() {
+        return levelTagName;
     }
 
-    public Long getCourseDraftId(){
+    public Integer getLikeCount() {
+        return likeCount != null ? likeCount : 0;
+    }
+
+    public Boolean getIsLike() {
+        return isLike != null ? isLike : false;
+    }
+
+    public Long getCourseDraftId() {
         return courseDraftId;
     }
 
-    private List<Point> points;
+    public Integer getBookmarkCount() {
+        return bookmarkCount != null ? bookmarkCount : 0;
+    }
 
-    public List<Point> getPoints(){
+    public Boolean getIsBookmark() {
+        return isBookmark != null ? isBookmark : false;
+    }
+
+    public Integer getCommentCount() {
+        return commentCount != null ? commentCount : 0;
+    }
+
+    public List<Point> getPoints() {
         return points;
     }
 
-    public static class Point{
-        private Double latitude;
-        private Double longitude;
-        public Double getLatitude(){
+    // 내부 Point 클래스 (지도 경로용)
+    public static class Point {
+        private double latitude;
+        private double longitude;
+
+        public double getLatitude() {
             return latitude;
         }
-        public Double getLongitude(){
+
+        public double getLongitude() {
             return longitude;
         }
     }
