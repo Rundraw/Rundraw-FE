@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rundraw_fe.api.RestaurantApi
 import com.example.rundraw_fe.auth.RetrofitClient
+import com.example.rundraw_fe.response.ApiResponse
 import com.example.rundraw_fe.response.RestaurantResponse
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -22,73 +22,93 @@ import com.google.android.gms.maps.model.MarkerOptions
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.google.android.gms.maps.model.Marker
 
 class RestaurantActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
 
-    // 우측 상단 숫자와 하단 리사이클러뷰/어댑터 변수
     private lateinit var tvSavedCount: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var restaurantAdapter: RestaurantAdapter
 
-    // 자동완성 검색 관련 변수
     private lateinit var etSearch: EditText
     private lateinit var rvAutocomplete: RecyclerView
-    private lateinit var autocompleteAdapter: RestaurantAdapter
 
-    private var allRestaurantList: List<RestaurantResponse> = listOf()
+    private val markerMap = mutableMapOf<Long, Marker>()
+    private var selectedRestaurantCourseId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant)
 
-        // 뷰 연결
         tvSavedCount = findViewById(R.id.tvSavedCount)
         recyclerView = findViewById(R.id.recyclerViewSaved)
 
-        // 하단 맛집 리사이클러뷰 세팅
         restaurantAdapter = RestaurantAdapter()
+        selectedRestaurantCourseId = intent.getLongExtra("restaurantCourseId", -1)
+
+        restaurantAdapter.setOnRestaurantClickListener { restaurant ->
+            if (!::googleMap.isInitialized) {
+                return@setOnRestaurantClickListener
+            }
+
+            if (restaurant.latitude != null && restaurant.longitude != null) {
+                val position = LatLng(restaurant.latitude!!, restaurant.longitude!!)
+
+                googleMap.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                                position,
+                                17f
+                        )
+                )
+
+                // 기존 마커 찾기
+                val marker = markerMap[restaurant.restaurantCourseId]
+
+                if (marker != null) {
+                    marker.showInfoWindow()
+                }
+            }
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = restaurantAdapter
 
-        // 검색창 및 자동완성 리사이클러뷰 뷰 연결
         etSearch = findViewById(R.id.etSearch)
         rvAutocomplete = findViewById(R.id.rvAutocomplete)
-
-        autocompleteAdapter = RestaurantAdapter()
-        rvAutocomplete.layoutManager = LinearLayoutManager(this)
-        rvAutocomplete.adapter = autocompleteAdapter
-
-        // 글자 입력 감지 리스너 (문법 오류 수정 완료)
         etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+            ) {}
+
+            override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int
+            ) {
                 val keyword = s.toString().trim()
 
                 if (keyword.isNotEmpty()) {
-                    val filteredList = allRestaurantList.filter {
-                        (it.restaurantName?.contains(keyword, ignoreCase = true) == true) ||
-                                (it.courseTitle?.contains(keyword, ignoreCase = true) == true)
-                    }
-
-                    if (filteredList.isNotEmpty()) {
-                        autocompleteAdapter.setRestaurantList(filteredList)
-                        rvAutocomplete.visibility = View.VISIBLE
-                    } else {
-                        rvAutocomplete.visibility = View.GONE
+                    if (::googleMap.isInitialized) {
+                        searchRestaurantOnMap(keyword)
                     }
                 } else {
-                    rvAutocomplete.visibility = View.GONE
+                    if (::googleMap.isInitialized) {
+                        loadRestaurantMarkersFromServer()
+                    }
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // 구글 맵뷰 연결 및 생명주기 전달
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
@@ -99,52 +119,159 @@ class RestaurantActivity : AppCompatActivity(), OnMapReadyCallback {
         loadRestaurantMarkersFromServer()
     }
 
+    /**
+     * 전체 맛집 조회
+     */
     private fun loadRestaurantMarkersFromServer() {
-        Log.d("RestaurantActivity", "서버 통신 시도 시작!")
+        val api = RetrofitClient.getInstance(this)
+                .create(RestaurantApi::class.java)
 
-        val restaurantApi = RetrofitClient.getInstance(this).create(RestaurantApi::class.java)
+        api.getRestaurant()
+                .enqueue(object : Callback<ApiResponse<List<RestaurantResponse>>> {
 
-        restaurantApi.getAllRestaurants().enqueue(object : Callback<List<RestaurantResponse>> {
-            override fun onResponse(
-                call: Call<List<RestaurantResponse>>,
-                response: Response<List<RestaurantResponse>>
-            ) {
-                Log.d("RestaurantActivity", "서버 응답 도착! 코드: ${response.code()}")
+                    override fun onResponse(
+                            call: Call<ApiResponse<List<RestaurantResponse>>>,
+                            response: Response<ApiResponse<List<RestaurantResponse>>>
+                    ) {
+                        if (!response.isSuccessful) return
 
-                if (response.isSuccessful && response.body() != null) {
-                    val restaurantList = response.body()!!
+                        val restaurantList = response.body()?.result ?: emptyList()
 
-                    allRestaurantList = restaurantList
+                        tvSavedCount.text = "${restaurantList.size} 📌"
 
-                    tvSavedCount.text = "${restaurantList.size} 📌"
-                    restaurantAdapter.setRestaurantList(restaurantList)
+                        restaurantAdapter.setRestaurantList(restaurantList)
 
-                    googleMap.clear()
-                    for (item in restaurantList) {
-                        if (item.latitude != null && item.longitude != null) {
-                            val position = LatLng(item.latitude, item.longitude)
-                            val markerOptions = MarkerOptions()
-                                .position(position)
-                                .title(item.restaurantName)
-                                .snippet("코с: ${item.courseTitle ?: "없음"}")
+                        googleMap.clear()
+                        markerMap.clear()
 
-                            googleMap.addMarker(markerOptions)
+                        // 마커 생성
+                        restaurantList.forEach { restaurant ->
+                            if (restaurant.latitude != null && restaurant.longitude != null) {
+                                val marker = googleMap.addMarker(
+                                        MarkerOptions()
+                                                .position(
+                                                        LatLng(
+                                                                restaurant.latitude!!,
+                                                                restaurant.longitude!!
+                                                        )
+                                                )
+                                                .title(restaurant.restaurantName)
+                                                .snippet(restaurant.courseName)
+                                )
+
+                                if (marker != null) {
+                                    markerMap[restaurant.restaurantCourseId] = marker
+                                }
+                            }
+                        }
+
+                        // -------------------------------
+                        // 홈에서 넘어온 맛집이 있는 경우
+                        // -------------------------------
+                        if (selectedRestaurantCourseId != -1L) {
+                            val marker = markerMap[selectedRestaurantCourseId]
+
+                            if (marker != null) {
+                                googleMap.animateCamera(
+                                        CameraUpdateFactory.newLatLngZoom(
+                                                marker.position,
+                                                17f
+                                        )
+                                )
+
+                                marker.showInfoWindow()
+
+                                // 중요!!
+                                return
+                            }
+                        }
+
+                        // -------------------------------
+                        // 일반 진입 시 첫 번째 맛집으로 이동
+                        // -------------------------------
+                        val first = restaurantList.firstOrNull {
+                            it.latitude != null && it.longitude != null
+                        }
+
+                        if (first != null) {
+                            googleMap.moveCamera(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                            LatLng(
+                                                    first.latitude!!,
+                                                    first.longitude!!
+                                            ),
+                                            14f
+                                    )
+                            )
                         }
                     }
 
-                    if (restaurantList.isNotEmpty()) {
-                        val firstPos = LatLng(restaurantList[0].latitude!!, restaurantList[0].longitude!!)
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(firstPos, 14f))
+                    override fun onFailure(
+                            call: Call<ApiResponse<List<RestaurantResponse>>>,
+                            t: Throwable
+                    ) {
+                        Log.e("Restaurant", t.message ?: "")
                     }
-                } else {
-                    Log.e("RestaurantActivity", "서버 응답 실패: ${response.code()}")
-                }
-            }
+                })
+    }
 
-            override fun onFailure(call: Call<List<RestaurantResponse>>, t: Throwable) {
-                Log.e("RestaurantActivity", "통신 에러 발생: ${t.message}")
-            }
-        })
+    /**
+     * 검색 후 지도 표시
+     */
+    private fun searchRestaurantOnMap(keyword: String) {
+        val api = RetrofitClient.getInstance(this)
+                .create(RestaurantApi::class.java)
+
+        api.searchRestaurant(keyword)
+                .enqueue(object : Callback<ApiResponse<List<RestaurantResponse>>> {
+
+                    override fun onResponse(
+                            call: Call<ApiResponse<List<RestaurantResponse>>>,
+                            response: Response<ApiResponse<List<RestaurantResponse>>>
+                    ) {
+                        if (response.isSuccessful) {
+                            val list = response.body()?.result ?: emptyList()
+
+                            googleMap.clear()
+
+                            list.forEach { restaurant ->
+                                if (restaurant.latitude != null && restaurant.longitude != null) {
+                                    val position = LatLng(restaurant.latitude!!, restaurant.longitude!!)
+
+                                    googleMap.addMarker(
+                                            MarkerOptions()
+                                                    .position(position)
+                                                    .title(restaurant.restaurantName)
+                                                    .snippet(restaurant.courseName)
+                                    )
+                                }
+                            }
+
+                            val first = list.firstOrNull {
+                                it.latitude != null && it.longitude != null
+                            }
+
+                            if (first != null) {
+                                googleMap.animateCamera(
+                                        CameraUpdateFactory.newLatLngZoom(
+                                                LatLng(
+                                                        first.latitude!!,
+                                                        first.longitude!!
+                                                ),
+                                                15f
+                                        )
+                                )
+                            }
+                        }
+                    }
+
+                    override fun onFailure(
+                            call: Call<ApiResponse<List<RestaurantResponse>>>,
+                            t: Throwable
+                    ) {
+                        Log.e("SearchRestaurant", t.message ?: "")
+                    }
+                })
     }
 
     override fun onResume() {
