@@ -3,21 +3,33 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@drawable/bg_home_page"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="25dp"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <!-- 페이지 타이틀 -->
         <TextView
+            android:id="@+id/memberName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="홈"
-            android:textSize="20sp"
+            android:text="솔순님, 반가워요!"
+            android:textSize="16sp"
+            android:gravity="center"
             android:textStyle="bold"
+            android:textColor="#000000"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="오늘도 나만의 그림을 따라 달려볼까요?"
+            android:textSize="15sp"
             android:gravity="center"
             android:layout_marginBottom="16dp" />
 
@@ -37,27 +49,40 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="내 경로 보기"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#000000" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
-                android:textSize="18sp" />
+                android:text="더보기"
+                android:textSize="15sp"
+                android:drawableEnd="@drawable/ic_more_btn"
+                android:textColor="#666666"/>
         </LinearLayout>
 
         <!-- 내 경로 카드 리스트 (RecyclerView로 교체 가능) -->
         <LinearLayout
             android:id="@+id/myRouteContainer"
-            android:layout_width="match_parent"
+            android:layout_width="340dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:background="@drawable/bg_round_white"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:elevation="4dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:layout_marginBottom="16dp">
 
             <!-- 카드 1 (완료 - 초록) -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="#E6E6E6"
-                android:layout_marginBottom="8dp">
+                android:background="#ffffff"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp">
                 <View
                     android:layout_width="10dp"
                     android:layout_height="10dp"
@@ -71,7 +96,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="#E6E6E6"
+                android:background="#ffffff"
                 android:layout_marginBottom="8dp">
                 <View
                     android:layout_width="10dp"
@@ -86,7 +111,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="#E6E6E6"
+                android:background="#ffffff"
                 android:layout_marginBottom="16dp">
                 <View
                     android:layout_width="10dp"
@@ -114,7 +139,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="내가 저장한 맛집"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#000000"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="더보기"
+                android:textSize="15sp"
+                android:drawableEnd="@drawable/ic_more_btn"
+                android:textColor="#666666"/>
         </LinearLayout>
 
         <!-- 맛집 카드 -->
@@ -123,50 +157,153 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#F5F5F5"
-            android:padding="12dp"
+            android:gravity="center"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="6dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:layout_marginBottom="16dp">
 
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="#DDDDDD"
-                android:layout_marginEnd="12dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="@null" />
 
+            <!-- 카드 1 -->
             <LinearLayout
+                android:id="@+id/restaurantCard1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="140dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:elevation="2dp"
+                android:background="@drawable/bg_round_white">
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:src="@drawable/img_restaurant" />
+
 
                 <TextView
-                    android:id="@+id/tvRestaurantName"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tvRestaurantName1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold" />
+                    android:text="맛집 1"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"/>
+
 
                 <TextView
-                    android:id="@+id/tvRestaurantAddress"
+                    android:id="@+id/tvRestaurantCourse1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="한강 러닝 코스"
                     android:textSize="11sp"
-                    android:textColor="#888888" />
+                    android:textColor="#0D51A5"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/bg_course_tag"/>
 
-                <TextView
-                    android:id="@+id/tvRestaurantCourse"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="11sp" />
-
-                <TextView
-                    android:id="@+id/tvRestaurantRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFA000"
-                    android:textSize="12sp" />
             </LinearLayout>
+
+
+
+            <!-- 카드 2 -->
+            <LinearLayout
+                android:id="@+id/restaurantCard2"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:elevation="2dp"
+                android:background="@drawable/bg_round_white">
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:src="@drawable/img_restaurant" />
+
+
+                <TextView
+                    android:id="@+id/tvRestaurantName2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="맛집 2"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"/>
+
+
+                <TextView
+                    android:id="@+id/tvRestaurantCourse2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="한강 러닝 코스"
+                    android:textSize="11sp"
+                    android:textColor="#0D51A5"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/bg_course_tag"/>
+
+            </LinearLayout>
+
+
+
+            <!-- 카드 3 -->
+            <LinearLayout
+                android:id="@+id/restaurantCard3"
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:elevation="2dp"
+                android:background="@drawable/bg_round_white">
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:src="@drawable/img_restaurant" />
+
+
+                <TextView
+                    android:id="@+id/tvRestaurantName3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="맛집 3"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"/>
+
+
+                <TextView
+                    android:id="@+id/tvRestaurantCourse3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="한강 러닝 코스"
+                    android:textSize="11sp"
+                    android:textColor="#0D51A5"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/bg_course_tag"/>
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
         <!-- 인기 GPS ART 섹션 헤더 -->
@@ -186,13 +323,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="인기 GPS ART"
+                android:textSize="18sp"
+                android:textColor="#000000"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
-                android:textSize="18sp" />
+                android:text="더보기"
+                android:textSize="15sp"
+                android:drawableEnd="@drawable/ic_more_btn"
+                android:textColor="#666666"/>
         </LinearLayout>
 
         <!-- GPS ART 가로 이미지 리스트 -->

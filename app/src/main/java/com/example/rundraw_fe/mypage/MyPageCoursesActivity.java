@@ -82,13 +82,15 @@ public class MyPageCoursesActivity extends BaseActivity {
                             courseList.clear();
                             List<CourseRecordResponse> records = response.body().getResult().getCourseRecords();
                             for(CourseRecordResponse course : records) {
-                                // 완주 코스
-                                if(isCompleted && Boolean.TRUE.equals(course.getIsCompleted())) {
-                                    courseList.add(course);
+                                // 완주한 코스 탭
+                                if(isCompleted) {
+                                    if(Boolean.TRUE.equals(course.getIsCompleted())) {
+                                        courseList.add(course);
+                                    }
                                 }
-
-                                // 체험한 코스
-                                if(!isCompleted && Boolean.FALSE.equals(course.getIsCompleted())) {
+                                // 체험한 코스 탭
+                                else {
+                                    // 모든 코스 추가
                                     courseList.add(course);
                                 }
                             }
