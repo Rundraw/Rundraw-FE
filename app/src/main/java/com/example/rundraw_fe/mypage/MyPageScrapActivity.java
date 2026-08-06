@@ -1,5 +1,6 @@
 package com.example.rundraw_fe.mypage;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.rundraw_fe.BaseActivity;
+import com.example.rundraw_fe.CourseDetailActivity;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.auth.RetrofitClient;
@@ -23,7 +25,7 @@ import retrofit2.Response;
 
 public class MyPageScrapActivity extends BaseActivity {
 
-    private final List<String> courseList = new ArrayList<>();
+    private final List<ScrapCourseResponse> scrapList = new ArrayList<>();
     private MyPageCourseAdapter adapter;
 
     @Override
@@ -32,7 +34,13 @@ public class MyPageScrapActivity extends BaseActivity {
         setContentLayout(R.layout.activity_mypage_scrap);
 
         RecyclerView rvCourses = findViewById(R.id.rvCourses);
-        adapter = new MyPageCourseAdapter(courseList, MyPageCourseAdapter.MODE_COUNT);
+        adapter = new MyPageCourseAdapter(scrapList, MyPageCourseAdapter.MODE_COUNT);
+        adapter.setOnItemClickListener((position, courseName) -> {
+            ScrapCourseResponse course = scrapList.get(position);
+            Intent intent = new Intent(MyPageScrapActivity.this, CourseDetailActivity.class);
+            intent.putExtra("courseId", course.getCourseId());
+            startActivity(intent);
+        });
         rvCourses.setLayoutManager(new LinearLayoutManager(this));
         rvCourses.setAdapter(adapter);
 
@@ -49,10 +57,8 @@ public class MyPageScrapActivity extends BaseActivity {
             public void onResponse(Call<ApiResponse<ScrapCourseListResponse>> call,
                                    Response<ApiResponse<ScrapCourseListResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    courseList.clear();
-                    for (ScrapCourseResponse course : response.body().getResult().getScrapCourses()) {
-                        courseList.add(course.getDisplayName());
-                    }
+                    scrapList.clear();
+                    scrapList.addAll(response.body().getResult().getScrapCourses());
                     adapter.notifyDataSetChanged();
                 }
             }

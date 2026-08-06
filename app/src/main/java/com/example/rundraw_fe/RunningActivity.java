@@ -21,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.rundraw_fe.api.CourseApiService;
+import com.example.rundraw_fe.auth.RetrofitClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -56,6 +57,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView tvElapsedTime, tvRunningDistance, tvPace, tvDestinationName;
 
     private CourseApiService apiService;
+    private CourseApiService.FinishRecordResponse finishResult = null;
     private Long courseDraftId;
     private Long recordId = -1L;
     private int pointSequence = 1;
@@ -106,11 +108,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         tvPace = findViewById(R.id.tvPace);
         tvDestinationName = findViewById(R.id.tvDestinationName);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiService = retrofit.create(CourseApiService.class);
+        apiService = RetrofitClient.getInstance(this).create(CourseApiService.class);
 
         tts = new android.speech.tts.TextToSpeech(this, status -> {
             if (status == android.speech.tts.TextToSpeech.SUCCESS) {
@@ -284,7 +282,15 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                     startLocationUpdates();
                     fetchLastKnownLocation();
                 } else {
-                    Log.w(TAG, "⚠️ 코스 기록 시작 실패. 임시 더미 모드 작동");
+                    Log.w(TAG, "⚠️ 코스 기록 시작 실패. 코드: " + response.code());
+                    try {
+                        if (response.errorBody() != null) {
+                            Log.w(TAG, "⚠️ Error Body: " + response.errorBody().string()); // ★ 추가
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error body 파싱 실패: " + e.getMessage());
+                    }
+                    Toast.makeText(RunningActivity.this, "기록 시작에 실패했습니다. 임시 모드로 진행합니다.", Toast.LENGTH_LONG).show();
                     setDummyRunningUI();
                     initTimerWithServerTime(null);
                     startLocationUpdates();
@@ -293,7 +299,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public void onFailure(Call<CourseApiService.StartRecordResponse> call, Throwable t) {
-                Log.e(TAG, "❌ 통신 오류, 더미 모드 작동: " + t.getMessage());
+                Log.e(TAG, "❌ 통신 오류: " + t.getClass().getSimpleName() + " - " + t.getMessage(), t);
+                Toast.makeText(RunningActivity.this, "서버에 연결할 수 없어 임시 모드로 진행합니다.", Toast.LENGTH_LONG).show();
                 setDummyRunningUI();
                 initTimerWithServerTime(null);
                 startLocationUpdates();
@@ -424,7 +431,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         // 서버 전송용 Request 객체 생성
-        CourseApiService.PointRequest request = new CourseApiService.PointRequest(recordId, pointSequence, currentLat, currentLng);
+        CourseApiService.PauseRequest request = new CourseApiService.PauseRequest(recordId, currentLat, currentLng);
         Log.d(TAG, "📡 일시정지 API 호출 시도 [recordId: " + recordId + ", lat: " + currentLat + ", lng: " + currentLng + "]");
 
         apiService.pauseRecord(recordId, request).enqueue(new Callback<Void>() {
@@ -518,8 +525,9 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 Log.d(TAG, "📥 종료 API 응답 수신 - 코드: " + response.code() + ", 성공 여부(isSuccessful): " + response.isSuccessful());
 
                 if (response.isSuccessful() && response.body() != null) {
-                    double distance = response.body().getDistanceKm();
-                    int durationSec = response.body().getDurationSec();
+                    finishResult = response.body(); // ★ 결과 저장
+                    double distance = finishResult.getDistanceKm();
+                    int durationSec = finishResult.getDurationSec();
                     Log.d(TAG, "✅ 기록 종료 통신 성공 [Distance: " + distance + "km, Time: " + durationSec + "s]");
                     showSuccessDialog();
                 } else {
@@ -531,6 +539,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                     } catch (Exception e) {
                         Log.e(TAG, "❌ Error Body 파싱 실패: " + e.getMessage());
                     }
+                    finishResult = null;
                     showSuccessDialog();
                 }
             }
@@ -584,8 +593,19 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 // ★ RecordDetailActivity로 이동하며 recordId 전달
                 Intent intent = new Intent(RunningActivity.this, RecordDetailActivity.class);
                 intent.putExtra("recordId", recordId);
-                startActivity(intent);
 
+                // ★ finish 결과를 직접 전달 (API 재호출 방지)
+                if (finishResult != null) {
+                    intent.putExtra("distanceKm", finishResult.getDistanceKm());
+                    intent.putExtra("durationSec", finishResult.getDurationSec());
+                    intent.putExtra("isCompleted", finishResult.isCompleted());
+                    if (finishResult.getPoints() != null) {
+                        intent.putExtra("pointsJson", new com.google.gson.Gson().toJson(finishResult.getPoints()));
+                    }
+                }
+
+
+                startActivity(intent);
                 finish();
             });
         }
