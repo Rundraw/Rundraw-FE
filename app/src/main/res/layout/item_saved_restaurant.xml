@@ -4,10 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:paddingTop="12dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="12dp">
 
     <!-- 음식 이미지 -->
     <ImageView
@@ -17,89 +17,41 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_background" />
 
-    <!-- 우측 텍스트 및 버튼 영역 -->
+    <!-- 가게 정보 -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginStart="16dp">
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
 
-        <!-- 가게 이름 & 주소 영역 -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- 가게 이름 -->
+        <TextView
+            android:id="@+id/tvRestaurantName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:text="따우전드"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvRestaurantName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="따우전드"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvRestaurantAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="서울특별시 광진구 능동로 37길 44"
-                android:textColor="#7A7A7A"
-                android:textSize="11sp" />
-        </LinearLayout>
-
-        <!-- 하단 태그 버튼 & 별점 영역 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
-
-            <Button
-                android:id="@+id/btnCourseTag"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:backgroundTint="#FFFFFF"
-                android:text="하트 코스"
-                android:textColor="#2196F3"
-                android:textSize="12sp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:stateListAnimator="@null" />
-
-            <LinearLayout
-                android:id="@+id/layoutRating"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_search_box"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp">
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@android:drawable/star_on" />
-
-                <TextView
-                    android:id="@+id/tvRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="x 5"
-                    android:textColor="#000000"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </LinearLayout>
+        <!-- 코스 태그 -->
+        <Button
+            android:id="@+id/btnCourseTag"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#FFFFFF"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:stateListAnimator="@null"
+            android:text="하트 코스"
+            android:textColor="#2196F3"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
 </LinearLayout>
+

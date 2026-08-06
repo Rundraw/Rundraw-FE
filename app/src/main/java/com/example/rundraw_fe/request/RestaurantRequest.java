@@ -1,25 +1,26 @@
-package com.example.rundraw_fe.response;
+package com.example.rundraw_fe.request;
 
-public class RestaurantResponse {
+public class RestaurantRequest {
 
-    private Long restaurantCourseId;
     private String restaurantName;
-    private String courseName;
     private String placeId;
     private Double longitude;
     private Double latitude;
 
-
-    public Long getRestaurantCourseId() {
-        return restaurantCourseId;
+    public RestaurantRequest(
+            String restaurantName,
+            String placeId,
+            Double longitude,
+            Double latitude
+    ) {
+        this.restaurantName = restaurantName;
+        this.placeId = placeId;
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
 
     public String getRestaurantName() {
         return restaurantName;
-    }
-
-    public String getCourseName() {
-        return courseName;
     }
 
     public String getPlaceId() {
