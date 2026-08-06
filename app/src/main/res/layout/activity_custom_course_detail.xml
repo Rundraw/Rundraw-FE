@@ -79,6 +79,13 @@
         android:layout_marginBottom="16dp"
         android:padding="16dp">
 
+        <!-- 실제 코스 지도가 표시되는 프래그먼트 -->
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -145,13 +152,12 @@
             android:paddingHorizontal="16dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- 경로 안내 버튼 (style을 제거하고 background를 입력창 배경과 동일하게 맞춘 뒤 tint 적용) -->
+        <!-- 경로 안내 버튼 -->
         <Button
             android:id="@+id/btnStartNavigation"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:background="@drawable/bg_custom_input_field_mypage"
-            android:backgroundTint="#7CB38E"
+            android:background="@drawable/bg_green_button"
             android:text="경로 안내"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
