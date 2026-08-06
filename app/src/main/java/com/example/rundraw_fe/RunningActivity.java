@@ -89,6 +89,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private android.speech.tts.TextToSpeech tts;
     private List<CourseApiService.InstructionDto> instructions = new ArrayList<>();
     private final List<Boolean> instructionPlayed = new ArrayList<>();
+    private List<LatLng> draftCoursePoints = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +117,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        loadCourseDraft(courseDraftId);
         loadNavigation(courseDraftId);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -156,8 +158,40 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         startCourseRecord(courseDraftId);
     }
 
+    private void loadCourseDraft(Long draftId) {
+        apiService.getCourseDraft(draftId).enqueue(new Callback<CourseApiService.CourseDetailResponse>() {
+            @Override
+            public void onResponse(Call<CourseApiService.CourseDetailResponse> call, Response<CourseApiService.CourseDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getPoints() != null) {
+                    draftCoursePoints.clear();
+                    for (CourseApiService.DraftPointDto p : response.body().getPoints()) {
+                        draftCoursePoints.add(new LatLng(p.getLatitude(), p.getLongitude()));
+                    }
+                    Log.d(TAG, "그린 코스 " + draftCoursePoints.size() + "개 포인트 로드 완료");
+                    drawCourseGuideLine();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CourseApiService.CourseDetailResponse> call, Throwable t) {
+                Log.e(TAG, "코스 조회 실패: " + t.getMessage());
+            }
+        });
+    }
+
+    private void drawCourseGuideLine() {
+        if (mMap == null || draftCoursePoints.isEmpty()) return;
+
+        PolylineOptions courseLine = new PolylineOptions()
+                .addAll(draftCoursePoints) // 실제 그린 좌표
+                .color(Color.parseColor("#A5D6A7"))
+                .width(10f);
+        mMap.addPolyline(courseLine);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(draftCoursePoints.get(0), 15f));
+    }
+
     private void loadNavigation(Long courseId) {
-        apiService.getNavigation(courseId).enqueue(new Callback<CourseApiService.NavigationResponse>() {
+        apiService.getNavigationFromDraft(courseId).enqueue(new Callback<CourseApiService.NavigationResponse>() {
             @Override
             public void onResponse(Call<CourseApiService.NavigationResponse> call, Response<CourseApiService.NavigationResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -640,18 +674,20 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         // 코스 기본 안내선 (연한 가이드라인)
-        LatLng startPoint = new LatLng(37.5665, 126.9780);
-        LatLng midPoint = new LatLng(37.5670, 126.9790);
-        LatLng endPoint = new LatLng(37.5680, 126.9800);
+//        LatLng startPoint = new LatLng(37.5665, 126.9780);
+//        LatLng midPoint = new LatLng(37.5670, 126.9790);
+//        LatLng endPoint = new LatLng(37.5680, 126.9800);
 
-        PolylineOptions courseLine = new PolylineOptions()
+        /*PolylineOptions courseLine = new PolylineOptions()
                 .add(startPoint)
                 .add(midPoint)
                 .add(endPoint)
                 .color(Color.parseColor("#A5D6A7")) // 연한 초록 가이드
-                .width(10f);
+                .width(10f);*/
 
-        mMap.addPolyline(courseLine);
+        //mMap.addPolyline(courseLine);
+
+        drawCourseGuideLine();// ★ 지도 준비됨 → 그려보기 시도 (데이터가 아직이면 함수 안에서 그냥 리턴됨)
 
         // ★ 사용자가 실시간으로 이동하는 경로선 (진한 초록색)
         PolylineOptions userLineOptions = new PolylineOptions()
@@ -659,7 +695,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 .width(14f);
         userRunningPolyline = mMap.addPolyline(userLineOptions);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15f));
+        // 고정 카메라 이동도 삭제 (drawCourseGuideLine 안에서 이미 카메라를 옮겨줌)
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15f));
     }
 
     @Override
