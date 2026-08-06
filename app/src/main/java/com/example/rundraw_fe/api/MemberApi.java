@@ -24,4 +24,8 @@ public interface MemberApi {
     Call<ApiResponse<String>> duplicateName(
             @Body NicknameRequest request
     );
+
+    @GET("api/users/me/name")
+    Call<ApiResponse<String>> getName();
+
 }
