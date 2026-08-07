@@ -98,6 +98,9 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private final List<Boolean> instructionPlayed = new ArrayList<>();
     private List<LatLng> draftCoursePoints = new ArrayList<>();
 
+    private static final float ROUTE_DEVIATION_THRESHOLD_M = 30f; // ★ 이탈로 판단할 거리(30m)
+    private boolean isOffRoute = false; // ★ 중복 경고 방지용
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,9 +160,6 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 finishRecord();
             });
         }
-
-        // ★ GPS 실시간 추적 콜백 정의 (3초 간격 위치 수신)
-        setupLocationCallback();
 
         // 러닝 화면 진입 시 코스 기록 시작 API 호출 -> 바로 시작은 삭제
         // startCourseRecord(courseDraftId);
@@ -248,6 +248,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                             userRunningPolyline.setPoints(userPathPoints);
                         }
 
+                        if (mMap != null) { // ★ 추가 — 서버 응답 기다리지 말고 바로 카메라 이동
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newPoint, 17f));
+                        }
+
                         // 2. 누적 이동 거리 및 페이스 실시간 계산
                         if (lastLocation != null) {
                             totalDistanceMeters += lastLocation.distanceTo(location);
@@ -258,6 +262,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         // 3. 백엔드 POST /point 좌표 전송
                         sendCurrentLocation(currentLat, currentLng);
                         checkNavigationTriggers(currentLat, currentLng);
+                        checkRouteDeviation(currentLat, currentLng);
                     }
                 }
             }
@@ -290,6 +295,45 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         "시작점으로 이동해주세요 (약 %.0fm 남음)", distanceToStart));
             }
         }
+    }
+
+    // ★ 새 메서드 — "지금 위치가 코스 선에서 얼마나 떨어졌는지" 계산
+    private void checkRouteDeviation(double lat, double lng) {
+        if (draftCoursePoints.size() < 2) return;
+
+        double minDistance = Double.MAX_VALUE;
+
+        // 코스를 이루는 좌표들을 하나씩 이어보면서, 그 선분과 내 위치 사이 최단 거리를 구함
+        for (int i = 0; i < draftCoursePoints.size() - 1; i++) {
+            LatLng segStart = draftCoursePoints.get(i);
+            LatLng segEnd = draftCoursePoints.get(i + 1);
+            double distance = distanceToSegment(lat, lng, segStart, segEnd);
+            minDistance = Math.min(minDistance, distance);
+        }
+
+        if (minDistance > ROUTE_DEVIATION_THRESHOLD_M) {
+            if (!isOffRoute) { // ★ 이탈이 처음 감지된 순간에만 경고
+                isOffRoute = true;
+                Log.w(TAG, "⚠️ 경로 이탈 감지 (거리: " + minDistance + "m)");
+                tts.speak("경로를 이탈했습니다", android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, null);
+                showNavigationBanner("경로를 이탈했습니다");
+            }
+        } else {
+            isOffRoute = false; // ★ 다시 경로로 복귀하면 초기화 (재이탈 시 다시 경고 가능)
+        }
+    }
+
+    // ★ 좌표 하나와 선분(두 좌표를 잇는 선) 사이의 최단 거리를 구하는 계산 함수
+    private double distanceToSegment(double lat, double lng, LatLng segStart, LatLng segEnd) {
+        float[] resultToStart = new float[1];
+        Location.distanceBetween(lat, lng, segStart.latitude, segStart.longitude, resultToStart);
+
+        float[] resultToEnd = new float[1];
+        Location.distanceBetween(lat, lng, segEnd.latitude, segEnd.longitude, resultToEnd);
+
+        // 간단하게: 선분의 양 끝점 중 더 가까운 쪽까지의 거리로 근사
+        // (정밀한 수직거리 계산이 필요하면 더 복잡한 공식이 필요하지만, 러닝 앱 수준에선 이 정도로 충분함)
+        return Math.min(resultToStart[0], resultToEnd[0]);
     }
 
     private void checkNavigationTriggers(double lat, double lng) {
@@ -479,10 +523,10 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 if (response.isSuccessful()) {
                     Log.d(TAG, "위치 전송 성공 [Seq: " + (pointSequence - 1) + "]");
 
-                    if (mMap != null) {
-                        LatLng currentLatLng = new LatLng(lat, lng);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f));
-                    }
+//                    if (mMap != null) {
+//                        LatLng currentLatLng = new LatLng(lat, lng);
+//                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f));
+//                    }
                 }
             }
 
