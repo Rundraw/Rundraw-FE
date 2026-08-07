@@ -1,5 +1,6 @@
 package com.example.rundraw_fe;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -7,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rundraw_fe.api.CourseApiService;
+import com.example.rundraw_fe.auth.RetrofitClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -63,47 +65,56 @@ public class RecordDetailActivity extends AppCompatActivity implements OnMapRead
     }
 
     private void loadRecordResultData() {
-        if (recordId == null || recordId == -1L) {
-            // [더미 모드] recordId가 없을 때 기본 예시 데이터 세팅
-            Log.w(TAG, "⚠️ 유효한 recordId가 없어 더미 데이터를 로드합니다.");
-            setUIData(1.19, 1421);
-            setDefaultRoutePoints();
-        } else {
-            // [서버 연동 모드] 백엔드 API 호출
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            CourseApiService apiService = retrofit.create(CourseApiService.class);
+
+        Intent intent = getIntent();
+        boolean hasPassedData = intent.hasExtra("distanceKm") && intent.hasExtra("durationSec");
+
+        if (hasPassedData) {
+            // ★ RunningActivity에서 넘어온 실제 데이터 사용 (API 재호출 없음)
+            double distance = intent.getDoubleExtra("distanceKm", 0.0);
+            int duration = intent.getIntExtra("durationSec", 0);
+            setUIData(distance, duration);
+
+            String pointsJson = intent.getStringExtra("pointsJson");
+            if (pointsJson != null) {
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                CourseApiService.FinishPointDto[] points =
+                        gson.fromJson(pointsJson, CourseApiService.FinishPointDto[].class);
+                routePoints.clear();
+                for (CourseApiService.FinishPointDto p : points) {
+                    routePoints.add(new LatLng(p.getLatitude(), p.getLongitude()));
+                }
+                if (mMap != null && !routePoints.isEmpty()) {
+                    drawRouteOnMap();
+                }
+            } else {
+                setDefaultRoutePoints();
+            }
+        } else if (recordId != null && recordId != -1L) {
+            // ★ 전달된 데이터 없이 recordId만 있는 경우 (딥링크 등) — fallback으로만 조회
+            // 주의: finish는 상태 변경 액션이라 이미 종료된 기록 재호출 시 서버 정책 확인 필요
+            CourseApiService apiService = RetrofitClient.getInstance(this).create(CourseApiService.class);
 
             apiService.finishRecord(recordId).enqueue(new Callback<CourseApiService.FinishRecordResponse>() {
                 @Override
                 public void onResponse(Call<CourseApiService.FinishRecordResponse> call, Response<CourseApiService.FinishRecordResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        CourseApiService.FinishRecordResponse result = response.body();
-
-                        double distance = result.getDistanceKm();
-                        int duration = result.getDurationSec();
-
-                        Log.d(TAG, "✅ 서버 데이터 로드 성공 [Distance: " + distance + "km, Duration: " + duration + "s]");
-                        setUIData(distance, duration);
-                        setDefaultRoutePoints(); // 서버에서 좌표 리스트를 따로 주지 않는 경우 기본 좌표 사용
+                        setUIData(response.body().getDistanceKm(), response.body().getDurationSec());
+                        setDefaultRoutePoints();
                     } else {
-                        // [더미 Fallback] 서버 응답이 비정상일 경우 앱 터짐 방지용 더미 데이터 출력
-                        Log.w(TAG, "⚠️ 서버 응답 비정상 [Code: " + response.code() + "], 안전하게 더미 데이터를 출력합니다.");
                         setUIData(1.19, 1421);
                         setDefaultRoutePoints();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<CourseApiService.FinishRecordResponse> call, Throwable t) {
-                    // [더미 Fallback] 통신 실패(서버 꺼짐 등) 시 더미 데이터 출력
-                    Log.e(TAG, "❌ 서버 통신 실패 (" + t.getMessage() + "), 안전하게 더미 데이터를 출력합니다.");
                     setUIData(1.19, 1421);
                     setDefaultRoutePoints();
                 }
             });
+        } else {
+            setUIData(1.19, 1421);
+            setDefaultRoutePoints();
         }
     }
 

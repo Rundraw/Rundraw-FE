@@ -13,7 +13,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.rundraw_fe.api.RankingApi;
@@ -61,12 +63,14 @@ public class CourseDetailActivity extends AppCompatActivity {
     private int bookmarkCount = 0;
     private RankingApi apiService;
     private Long courseId;
+    private Long courseDraftId;
     private BottomSheetBehavior commentBehavior;
     private CommentAdapter commentAdapter;
     private RecyclerView commentRecyclerView;
     private View commentInputLayout;
     private Long editingCommentId = null;
     private ImageButton btnBack;
+    private AppCompatButton btnStart;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -90,6 +94,7 @@ public class CourseDetailActivity extends AppCompatActivity {
         etComment = findViewById(R.id.etComment);
         btnCommentSend = findViewById(R.id.btnCommentSend);
         btnBack = findViewById(R.id.btnBack);
+        btnStart = findViewById(R.id.btnStart);
 
         courseMap.onCreate(savedInstanceState);
         courseMap.getMapAsync(map -> {
@@ -177,6 +182,17 @@ public class CourseDetailActivity extends AppCompatActivity {
         // 뒤로 가기
         btnBack.setOnClickListener(v -> {
             finish();
+        });
+
+        // 체험하기 버튼 -> 네비게이션 화면 이동
+        btnStart.setOnClickListener(v -> {
+            if (courseDraftId == null) {
+                Toast.makeText(this, "코스 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(CourseDetailActivity.this, NavigateActivity.class);
+            intent.putExtra("courseDraftId", courseDraftId);
+            startActivity(intent);
         });
 
         // 댓글 조회 버튼 클릭 이벤트
@@ -365,6 +381,17 @@ public class CourseDetailActivity extends AppCompatActivity {
                         );
             }
         });
+
+        btnStart.setOnClickListener(v -> {
+            if (courseDraftId == null) {
+                Log.e("COURSE_DETAIL", "courseDraftId가 없습니다.");
+                return;
+            }
+
+            Intent intent = new Intent(CourseDetailActivity.this, NavigateActivity.class);
+            intent.putExtra("courseDraftId", courseDraftId);
+            startActivity(intent);
+        });
     }
 
     private void loadCourseDetail(){
@@ -377,6 +404,8 @@ public class CourseDetailActivity extends AppCompatActivity {
                     ) {
                         if(response.isSuccessful() && response.body()!=null){
                             CourseDetailResponse data = response.body().getResult();
+                            // courseDraftId 저장
+                            courseDraftId = data.getCoursedraftId();
                             // 제목
                             tvCourseName.setText(data.getName());
                             // 작성자
@@ -417,26 +446,23 @@ public class CourseDetailActivity extends AppCompatActivity {
                             Call<ApiResponse<CourseDetailResponse>> call,
                             Throwable t
                     ){}
+                    private String getLevelText(String levelType) {
+                        if (levelType == null) {
+                            return "";
+                        }
+                        switch (levelType) {
+                            case "BEGINNER":
+                                return "초급";
+                            case "INTERMEDIATE":
+                                return "중급";
+                            case "ADVANCED":
+                                return "상급";
+                            default:
+                                return levelType;
+                        }
+                    }
                 });
     }
-
-    // 📌 getLevelText 메소드를 올바른 위치(액티비티 클래스 내부)로 이동
-    private String getLevelText(String levelType) {
-        if (levelType == null) {
-            return "";
-        }
-        switch (levelType) {
-            case "BEGINNER":
-                return "초급";
-            case "INTERMEDIATE":
-                return "중급";
-            case "ADVANCED":
-                return "상급";
-            default:
-                return levelType;
-        }
-    }
-
     private void drawCourseRoute(
             List<CourseDetailResponse.Point> points
     ){

@@ -18,6 +18,7 @@
 
     <!-- 2. 상단 목적지 표시 박스 -->
     <LinearLayout
+        android:id="@+id/layoutDestinationBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -46,6 +47,50 @@
             android:textStyle="bold"
             android:paddingTop="4dp"/>
     </LinearLayout>
+
+    <!-- ★ 2-1. 시작점 이동 안내 문구 (기록 시작 전에만 보임) -->
+    <TextView
+        android:id="@+id/tvStartGuide"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/rounded_box"
+        android:backgroundTint="#FFF3E0"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="시작점으로 이동해주세요"
+        android:textColor="#E65100"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutDestinationBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ★ 2-2. 좌/우회전 안내 배너 (기록 중 회전 지점에서 잠깐 보임) -->
+    <TextView
+        android:id="@+id/tvNavigationBanner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/rounded_box"
+        android:backgroundTint="#E3F2FD"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:padding="14dp"
+        android:text="잠시 후 좌회전입니다"
+        android:textColor="#0D47A1"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layoutDestinationBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 3. 우측 하단 미니 정보 카드 -->
 

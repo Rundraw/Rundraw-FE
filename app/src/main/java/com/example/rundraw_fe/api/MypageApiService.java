@@ -14,6 +14,8 @@ import retrofit2.http.PATCH;
 import retrofit2.http.Path;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface MypageApiService {
@@ -30,6 +32,9 @@ public interface MypageApiService {
     @GET("api/mypage/draft/course")
     Call<ApiResponse<DraftCourseListResponse>> getDrawnCourses();
 
+    // 그린 코스 공유 상태 토글 (백엔드 경로: draft/courses, 복수형)
+    @PATCH("api/mypage/draft/courses/{draftCourseId}/share")
+    Call<ApiResponse<Object>> toggleDraftSharing(@Path("draftCourseId") Long draftCourseId);
     // 코스 수정 API 연동
     @PATCH("api/course/{courseId}")
     Call<Void> updateCourse(

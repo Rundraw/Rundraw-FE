@@ -21,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.rundraw_fe.api.CourseApiService;
+import com.example.rundraw_fe.auth.RetrofitClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -56,11 +57,19 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private TextView tvElapsedTime, tvRunningDistance, tvPace, tvDestinationName;
 
     private CourseApiService apiService;
+    private CourseApiService.FinishRecordResponse finishResult = null;
     private Long courseDraftId;
     private Long recordId = -1L;
     private int pointSequence = 1;
 
     private boolean isPaused = false;
+
+
+    // 시작점을 맞추기 위한 변수들
+    private static final float START_POINT_THRESHOLD_M = 20f; // ★ 시작점으로 인정할 거리(20m 이내)
+    private boolean hasStartedRecording = false; // ★ 진짜 기록이 시작됐는지 여부
+    private TextView tvStartGuide; // ★ "시작점으로 이동하세요" 안내 문구
+    private TextView tvNavigationBanner; // ★ 화면에 좌/우회전 안내 띄우는 문구
 
     // 타이머 및 시간 계산을 위한 변수들
     private long startTimeMillis = 0L;
@@ -87,6 +96,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
     private android.speech.tts.TextToSpeech tts;
     private List<CourseApiService.InstructionDto> instructions = new ArrayList<>();
     private final List<Boolean> instructionPlayed = new ArrayList<>();
+    private List<LatLng> draftCoursePoints = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,11 +116,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         tvPace = findViewById(R.id.tvPace);
         tvDestinationName = findViewById(R.id.tvDestinationName);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiService = retrofit.create(CourseApiService.class);
+        apiService = RetrofitClient.getInstance(this).create(CourseApiService.class);
 
         tts = new android.speech.tts.TextToSpeech(this, status -> {
             if (status == android.speech.tts.TextToSpeech.SUCCESS) {
@@ -118,6 +124,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
+        loadCourseDraft(courseDraftId);
         loadNavigation(courseDraftId);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -154,12 +161,49 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // ★ GPS 실시간 추적 콜백 정의 (3초 간격 위치 수신)
         setupLocationCallback();
 
-        // 러닝 화면 진입 시 코스 기록 시작 API 호출
-        startCourseRecord(courseDraftId);
+        // 러닝 화면 진입 시 코스 기록 시작 API 호출 -> 바로 시작은 삭제
+        // startCourseRecord(courseDraftId);
+        tvStartGuide = findViewById(R.id.tvStartGuide);       // ★ activity_running.xml에 추가 필요
+        tvNavigationBanner = findViewById(R.id.tvNavigationBanner); // ★ activity_running.xml에 추가 필요
+
+        setupLocationCallback();
+        startLocationUpdates(); // ★ 기록은 아직 시작 안 하고, GPS 추적만 먼저 켜기
+    }
+
+    private void loadCourseDraft(Long draftId) {
+        apiService.getCourseDraft(draftId).enqueue(new Callback<CourseApiService.CourseDetailResponse>() {
+            @Override
+            public void onResponse(Call<CourseApiService.CourseDetailResponse> call, Response<CourseApiService.CourseDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getPoints() != null) {
+                    draftCoursePoints.clear();
+                    for (CourseApiService.DraftPointDto p : response.body().getPoints()) {
+                        draftCoursePoints.add(new LatLng(p.getLatitude(), p.getLongitude()));
+                    }
+                    Log.d(TAG, "그린 코스 " + draftCoursePoints.size() + "개 포인트 로드 완료");
+                    drawCourseGuideLine();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CourseApiService.CourseDetailResponse> call, Throwable t) {
+                Log.e(TAG, "코스 조회 실패: " + t.getMessage());
+            }
+        });
+    }
+
+    private void drawCourseGuideLine() {
+        if (mMap == null || draftCoursePoints.isEmpty()) return;
+
+        PolylineOptions courseLine = new PolylineOptions()
+                .addAll(draftCoursePoints) // 실제 그린 좌표
+                .color(Color.parseColor("#A5D6A7"))
+                .width(10f);
+        mMap.addPolyline(courseLine);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(draftCoursePoints.get(0), 15f));
     }
 
     private void loadNavigation(Long courseId) {
-        apiService.getNavigation(courseId).enqueue(new Callback<CourseApiService.NavigationResponse>() {
+        apiService.getNavigationFromDraft(courseId).enqueue(new Callback<CourseApiService.NavigationResponse>() {
             @Override
             public void onResponse(Call<CourseApiService.NavigationResponse> call, Response<CourseApiService.NavigationResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -190,6 +234,12 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         currentLng = location.getLongitude();
                         isRealLocationReceived = true;
 
+                        // 아직 기록을 시작 안 했다면 → "시작점에 도착했는지"만 검사
+                        if (!hasStartedRecording) {
+                            checkIfNearStartPoint(currentLat, currentLng);
+                            return; // 시작 전에는 경로 그리기, 서버 전송, 안내 다 스킵
+                        }
+
                         LatLng newPoint = new LatLng(currentLat, currentLng);
                         userPathPoints.add(newPoint);
 
@@ -214,6 +264,34 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         };
     }
 
+    // 시작점 검사 메서드 : "지금 위치 vs 그린 코스의 첫 좌표" 사이 거리를 재는 함수
+    private void checkIfNearStartPoint(double lat, double lng) {
+        if (draftCoursePoints.isEmpty()) {
+            if (tvStartGuide != null) tvStartGuide.setText("코스 정보를 불러오는 중...");
+            return;
+        }
+
+        LatLng startPoint = draftCoursePoints.get(0);
+        float[] result = new float[1];
+        Location.distanceBetween(lat, lng, startPoint.latitude, startPoint.longitude, result);
+        float distanceToStart = result[0]; // 미터 단위
+
+        if (distanceToStart <= START_POINT_THRESHOLD_M) {
+            // ★ 도착! 이제 진짜 기록 시작
+            hasStartedRecording = true;
+            if (tvStartGuide != null) tvStartGuide.setVisibility(View.GONE);
+            Log.d(TAG, "✅ 시작점 도착 확인 (거리: " + distanceToStart + "m). 기록을 시작합니다.");
+            startCourseRecord(courseDraftId); // ★ 여기서 진짜로 기록/타이머 시작
+        } else {
+            // ★ 아직 멀었으면 안내 문구만 계속 갱신
+            if (tvStartGuide != null) {
+                tvStartGuide.setVisibility(View.VISIBLE);
+                tvStartGuide.setText(String.format(Locale.getDefault(),
+                        "시작점으로 이동해주세요 (약 %.0fm 남음)", distanceToStart));
+            }
+        }
+    }
+
     private void checkNavigationTriggers(double lat, double lng) {
         for (int i = 0; i < instructions.size(); i++) {
             if (instructionPlayed.get(i)) continue;
@@ -227,6 +305,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 tts.speak(instruction.getText(), android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, null);
                 instructionPlayed.set(i, true);
                 Log.d(TAG, "음성 안내 재생: " + instruction.getText());
+
+                showNavigationBanner(instruction.getText());
             }
         }
     }
@@ -264,6 +344,18 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
+    // 화면에 안내 문구를 잠시 보이기
+    private void showNavigationBanner(String text) {
+        if (tvNavigationBanner == null) return;
+        tvNavigationBanner.setText(text);
+        tvNavigationBanner.setVisibility(View.VISIBLE);
+
+        // 3초 뒤 자동으로 숨기기
+        timerHandler.postDelayed(() -> {
+            if (tvNavigationBanner != null) tvNavigationBanner.setVisibility(View.GONE);
+        }, 3000);
+    }
+
     // [API 1] 코스 기록 시작 (POST /api/user/me/course/record)
     private void startCourseRecord(Long draftId) {
         CourseApiService.StartRecordRequest request = new CourseApiService.StartRecordRequest(draftId);
@@ -284,7 +376,15 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                     startLocationUpdates();
                     fetchLastKnownLocation();
                 } else {
-                    Log.w(TAG, "⚠️ 코스 기록 시작 실패. 임시 더미 모드 작동");
+                    Log.w(TAG, "⚠️ 코스 기록 시작 실패. 코드: " + response.code());
+                    try {
+                        if (response.errorBody() != null) {
+                            Log.w(TAG, "⚠️ Error Body: " + response.errorBody().string()); // ★ 추가
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error body 파싱 실패: " + e.getMessage());
+                    }
+                    Toast.makeText(RunningActivity.this, "기록 시작에 실패했습니다. 임시 모드로 진행합니다.", Toast.LENGTH_LONG).show();
                     setDummyRunningUI();
                     initTimerWithServerTime(null);
                     startLocationUpdates();
@@ -293,7 +393,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public void onFailure(Call<CourseApiService.StartRecordResponse> call, Throwable t) {
-                Log.e(TAG, "❌ 통신 오류, 더미 모드 작동: " + t.getMessage());
+                Log.e(TAG, "❌ 통신 오류: " + t.getClass().getSimpleName() + " - " + t.getMessage(), t);
+                Toast.makeText(RunningActivity.this, "서버에 연결할 수 없어 임시 모드로 진행합니다.", Toast.LENGTH_LONG).show();
                 setDummyRunningUI();
                 initTimerWithServerTime(null);
                 startLocationUpdates();
@@ -424,7 +525,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         // 서버 전송용 Request 객체 생성
-        CourseApiService.PointRequest request = new CourseApiService.PointRequest(recordId, pointSequence, currentLat, currentLng);
+        CourseApiService.PauseRequest request = new CourseApiService.PauseRequest(recordId, currentLat, currentLng);
         Log.d(TAG, "📡 일시정지 API 호출 시도 [recordId: " + recordId + ", lat: " + currentLat + ", lng: " + currentLng + "]");
 
         apiService.pauseRecord(recordId, request).enqueue(new Callback<Void>() {
@@ -518,8 +619,9 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 Log.d(TAG, "📥 종료 API 응답 수신 - 코드: " + response.code() + ", 성공 여부(isSuccessful): " + response.isSuccessful());
 
                 if (response.isSuccessful() && response.body() != null) {
-                    double distance = response.body().getDistanceKm();
-                    int durationSec = response.body().getDurationSec();
+                    finishResult = response.body(); // ★ 결과 저장
+                    double distance = finishResult.getDistanceKm();
+                    int durationSec = finishResult.getDurationSec();
                     Log.d(TAG, "✅ 기록 종료 통신 성공 [Distance: " + distance + "km, Time: " + durationSec + "s]");
                     showSuccessDialog();
                 } else {
@@ -531,6 +633,7 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                     } catch (Exception e) {
                         Log.e(TAG, "❌ Error Body 파싱 실패: " + e.getMessage());
                     }
+                    finishResult = null;
                     showSuccessDialog();
                 }
             }
@@ -584,8 +687,19 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 // ★ RecordDetailActivity로 이동하며 recordId 전달
                 Intent intent = new Intent(RunningActivity.this, RecordDetailActivity.class);
                 intent.putExtra("recordId", recordId);
-                startActivity(intent);
 
+                // ★ finish 결과를 직접 전달 (API 재호출 방지)
+                if (finishResult != null) {
+                    intent.putExtra("distanceKm", finishResult.getDistanceKm());
+                    intent.putExtra("durationSec", finishResult.getDurationSec());
+                    intent.putExtra("isCompleted", finishResult.isCompleted());
+                    if (finishResult.getPoints() != null) {
+                        intent.putExtra("pointsJson", new com.google.gson.Gson().toJson(finishResult.getPoints()));
+                    }
+                }
+
+
+                startActivity(intent);
                 finish();
             });
         }
@@ -620,18 +734,20 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         // 코스 기본 안내선 (연한 가이드라인)
-        LatLng startPoint = new LatLng(37.5665, 126.9780);
-        LatLng midPoint = new LatLng(37.5670, 126.9790);
-        LatLng endPoint = new LatLng(37.5680, 126.9800);
+//        LatLng startPoint = new LatLng(37.5665, 126.9780);
+//        LatLng midPoint = new LatLng(37.5670, 126.9790);
+//        LatLng endPoint = new LatLng(37.5680, 126.9800);
 
-        PolylineOptions courseLine = new PolylineOptions()
+        /*PolylineOptions courseLine = new PolylineOptions()
                 .add(startPoint)
                 .add(midPoint)
                 .add(endPoint)
                 .color(Color.parseColor("#A5D6A7")) // 연한 초록 가이드
-                .width(10f);
+                .width(10f);*/
 
-        mMap.addPolyline(courseLine);
+        //mMap.addPolyline(courseLine);
+
+        drawCourseGuideLine();// ★ 지도 준비됨 → 그려보기 시도 (데이터가 아직이면 함수 안에서 그냥 리턴됨)
 
         // ★ 사용자가 실시간으로 이동하는 경로선 (진한 초록색)
         PolylineOptions userLineOptions = new PolylineOptions()
@@ -639,7 +755,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 .width(14f);
         userRunningPolyline = mMap.addPolyline(userLineOptions);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15f));
+        // 고정 카메라 이동도 삭제 (drawCourseGuideLine 안에서 이미 카메라를 옮겨줌)
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startPoint, 15f));
     }
 
     @Override

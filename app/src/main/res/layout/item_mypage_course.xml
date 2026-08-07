@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:paddingHorizontal="12dp"
-    android:background="#E6E6E6"
+    android:background="#ffffff"
     android:layout_marginBottom="8dp">
 
     <View
@@ -20,13 +20,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="코스 이름" />
+        android:text="코스 이름"
+        android:textSize="14sp"
+        android:textColor="#000000" />
 
     <View
         android:id="@+id/statusDot"
         android:layout_width="10dp"
         android:layout_height="10dp"
-        android:background="@drawable/dot_green"
         android:visibility="gone" />
 
     <TextView

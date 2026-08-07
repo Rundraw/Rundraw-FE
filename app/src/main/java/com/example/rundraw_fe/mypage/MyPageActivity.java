@@ -1,12 +1,14 @@
 package com.example.rundraw_fe.mypage;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.example.rundraw_fe.BaseActivity;
+import com.example.rundraw_fe.MainActivity;
 import com.example.rundraw_fe.R;
 import com.example.rundraw_fe.api.MemberApi;
 import com.example.rundraw_fe.auth.MemberResponse;
@@ -57,7 +59,8 @@ public class MyPageActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(Call<MemberResponse> call, Throwable t) {}
+            public void onFailure(Call<MemberResponse> call, Throwable t) {
+            }
         });
     }
 
@@ -74,8 +77,18 @@ public class MyPageActivity extends BaseActivity {
         btnMyDrawn.setOnClickListener(v ->
                 startActivity(new Intent(this, MyPageDrawnActivity.class)));
 
-        // TODO: 로그아웃 처리 (카카오 로그인 붙인 후 구현 예정)
-        tvLogout.setOnClickListener(v -> {
-        });
+        tvLogout.setOnClickListener(v -> logout());
+    }
+
+    private void logout() {
+        // 로컬 토큰 삭제
+        SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
+        prefs.edit().clear().apply();
+
+        // 카카오 로그인 화면(MainActivity)으로 이동, 백스택 정리
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

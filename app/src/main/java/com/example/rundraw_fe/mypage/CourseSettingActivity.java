@@ -15,8 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.rundraw_fe.R;
-import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.api.RankingApi;
+import com.example.rundraw_fe.api.MypageApiService;
 import com.example.rundraw_fe.auth.RetrofitClient;
 import com.example.rundraw_fe.request.CourseSettingReqDTO;
 import com.example.rundraw_fe.response.ApiResponse;
@@ -106,7 +106,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             mapFragment.getMapAsync(this);
         }
 
-        // 👉 불러오기: RankingApi 사용 (points 포함되는 쪽)
         loadExistingCourseData();
 
         btnLevelHigh.setOnClickListener(v -> {
@@ -124,7 +123,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             Toast.makeText(this, "하급 코스로 선택되었습니다.", Toast.LENGTH_SHORT).show();
         });
 
-        // 👉 저장: MypageApiService의 PATCH 사용
         btnSaveCourse.setOnClickListener(v -> {
             String title = etSettingCourseName.getText().toString().trim();
             String description = etSettingCourseDesc.getText().toString().trim();
@@ -155,7 +153,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             });
         });
 
-        // ⚠️ 삭제하기: 아직 실제 서버 호출 없음 (아래 설명 참고)
         btnDeleteCourse.setOnClickListener(v -> {
             Toast.makeText(this, "코스가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
             finish();
@@ -170,8 +167,8 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
     }
 
     /**
-     * 서버에서 기존 코스 정보(이름, 설명, 난이도, 경로 좌표)를 불러옴
-     * RankingApi 사용 이유: points(경로 좌표)가 이쪽 응답에 포함됨
+     * 서버에서 기존 코스 정보를 불러와서 셋팅
+     * (최신 CourseDetailResponse 구조: getContent(), getLevelType() 사용)
      */
     private void loadExistingCourseData() {
         Log.d(TAG, "loadExistingCourseData() 호출됨, courseId = " + courseId);
@@ -181,43 +178,43 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
 
         rankingApi.getCourseDetail(courseId).enqueue(new Callback<ApiResponse<CourseDetailResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<CourseDetailResponse>> call, Response<ApiResponse<CourseDetailResponse>> response) {
+            public void onResponse(Call<ApiResponse<CourseDetailResponse>> call,
+                                   Response<ApiResponse<CourseDetailResponse>> response) {
                 Log.d(TAG, "API 응답 code = " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
-                    CourseDetailResponse data = response.body().getResult(); // ⚠️ getter명 확인 필요
+                    CourseDetailResponse data = response.body().getResult();
 
-                    if (data == null) {
-                        Log.e(TAG, "응답 body는 있지만 data가 null입니다.");
-                        return;
-                    }
-
-                    if (data.getName() != null) {
-                        etSettingCourseName.setText(data.getName());
-                    }
-
-                    if (data.getDescription() != null && !data.getDescription().isEmpty()) {
-                        etSettingCourseDesc.setText(data.getDescription());
-                    } else if (data.getContent() != null && !data.getContent().isEmpty()) {
-                        etSettingCourseDesc.setText(data.getContent());
-                    }
-
-                    if (data.getLevelTagName() != null) {
-                        selectedLevel = data.getLevelTagName();
-                    }
-
-                    List<CourseDetailResponse.Point> points = data.getPoints();
-                    if (points != null && !points.isEmpty()) {
-                        coursePoints.clear();
-                        for (int i = 0; i < points.size(); i++) {
-                            CourseDetailResponse.Point point = points.get(i);
-                            coursePoints.add(new LatLng(point.getLatitude(), point.getLongitude()));
+                    if (data != null) {
+                        // 1. 코스 이름 세팅
+                        if (data.getName() != null) {
+                            etSettingCourseName.setText(data.getName());
                         }
 
-                        if (isMapReady) {
-                            drawCourseLine();
+                        // 2. 코스 설명 세팅 (getDescription() → getContent()로 변경)
+                        if (data.getContent() != null && !data.getContent().isEmpty()) {
+                            etSettingCourseDesc.setText(data.getContent());
                         }
-                    } else {
-                        Log.w(TAG, "포인트 데이터가 비어있습니다.");
+
+                        // 3. 난이도 세팅 (getLevelTagName() → getLevelType()으로 변경)
+                        if (data.getLevelType() != null) {
+                            selectedLevel = data.getLevelType();
+                        }
+
+                        // 4. 포인트 좌표들을 이용해 지도 선 세팅
+                        List<CourseDetailResponse.Point> points = data.getPoints();
+                        if (points != null && !points.isEmpty()) {
+                            coursePoints.clear();
+                            for (int i = 0; i < points.size(); i++) {
+                                CourseDetailResponse.Point point = points.get(i);
+                                coursePoints.add(new LatLng(point.getLatitude(), point.getLongitude()));
+                            }
+
+                            if (isMapReady) {
+                                drawCourseLine();
+                            }
+                        } else {
+                            Log.w(TAG, "포인트 데이터가 비어있습니다.");
+                        }
                     }
                 } else {
                     Log.e(TAG, "상세 정보 불러오기 실패: " + response.code());
