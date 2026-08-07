@@ -21,6 +21,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -32,6 +33,8 @@ public class MyPageCoursesActivity extends BaseActivity {
     private TextView tabCompleted;
     private TextView tabExperience;
     private View tabUnderline;
+    private ImageButton btnBack;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,8 +51,12 @@ public class MyPageCoursesActivity extends BaseActivity {
         tabExperience = findViewById(R.id.tabExperience);
         tabUnderline = findViewById(R.id.tabUnderline);
 
+        // 뒤로가기
+        btnBack= findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
-// 기본 선택
+
+        // 기본 선택
         loadCourses(true);
 
         tabCompleted.setOnClickListener(v -> {

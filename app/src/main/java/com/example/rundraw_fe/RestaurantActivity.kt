@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,9 +40,16 @@ class RestaurantActivity : AppCompatActivity(), OnMapReadyCallback {
     private val markerMap = mutableMapOf<Long, Marker>()
     private var selectedRestaurantCourseId: Long = -1
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_restaurant)
+
+        // 뒤로가기 버튼
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
+        btnBack.setOnClickListener {
+            finish()
+        }
 
         tvSavedCount = findViewById(R.id.tvSavedCount)
         recyclerView = findViewById(R.id.recyclerViewSaved)

@@ -2,6 +2,7 @@ package com.example.rundraw_fe.mypage;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageButton;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ public class MyPageCommentsActivity extends BaseActivity {
     private RecyclerView rvComments;
     private MyPageCommentAdapter adapter;
     private final List<MypageCommentResponse> commentList = new ArrayList<>();
+    private ImageButton btnBack;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,6 +38,10 @@ public class MyPageCommentsActivity extends BaseActivity {
         adapter = new MyPageCommentAdapter(commentList);
         rvComments.setLayoutManager(new LinearLayoutManager(this));
         rvComments.setAdapter(adapter);
+
+        // 뒤로가기
+        btnBack= findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
         loadComments();
         setupBottomNavigation(R.id.navigation_my);

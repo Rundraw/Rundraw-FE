@@ -15,7 +15,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background" />
+        android:src="@drawable/img_restaurant" />
 
     <!-- 가게 정보 -->
     <LinearLayout
@@ -41,15 +41,15 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_marginTop="10dp"
-            android:backgroundTint="#FFFFFF"
+            android:background="@drawable/bg_course_tag"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
             android:stateListAnimator="@null"
             android:text="하트 코스"
-            android:textColor="#2196F3"
-            android:textSize="12sp" />
+            android:textColor="#ffffff"
+            android:textSize="12sp"/>
 
     </LinearLayout>
 
