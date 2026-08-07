@@ -43,26 +43,25 @@ public class MyPageCommentAdapter extends RecyclerView.Adapter<MyPageCommentAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MypageCommentResponse comment = commentList.get(position);
         holder.tvContent.setText(comment.getContent());
-        // 삭제 버튼
+
         holder.tvDelete.setOnClickListener(v -> {
             int currentPosition = holder.getAdapterPosition();
-            if(currentPosition == RecyclerView.NO_POSITION){
+            if (currentPosition == RecyclerView.NO_POSITION) {
                 return;
             }
-            Long courseId = comment.getCourseId();
-            Long commentId = comment.getCommentId();
+
+            Long commentId = commentList.get(currentPosition).getCommentId();
             RankingApi apiService = RetrofitClient.getInstance(v.getContext()).create(RankingApi.class);
-            apiService.deleteComment(courseId, commentId).enqueue(new Callback<ApiResponse<Object>>() {
+            apiService.deleteMyComment(commentId).enqueue(new Callback<ApiResponse<Object>>() {
                 @Override
                 public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
-                    if(response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         commentList.remove(currentPosition);
                         notifyItemRemoved(currentPosition);
                         notifyItemRangeChanged(currentPosition, commentList.size());
                         Log.d("DeleteComment", "댓글 삭제 성공");
                     } else {
-                        Log.e("DeleteComment", "댓글 삭제 실패 : " + response.code()
-                        );
+                        Log.e("DeleteComment", "댓글 삭제 실패 : " + response.code());
                     }
                 }
                 @Override

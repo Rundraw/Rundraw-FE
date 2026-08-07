@@ -106,4 +106,10 @@ public interface RankingApi {
             @Path("commentId") Long commentId,
             @Body UpdateCommentRequest request
     );
+
+    // 댓글 삭제
+    @DELETE("api/mypage/comments/{commentId}")
+    Call<ApiResponse<Object>> deleteMyComment(
+            @Path("commentId") Long commentId
+    );
 }
