@@ -52,6 +52,14 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
     private boolean isMapReady = false;
     private final List<LatLng> coursePoints = new ArrayList<>();
 
+    // 클래스 필드에 색상 상수 추가 (선택됨 / 선택안됨)
+    private static final int COLOR_HIGH_SELECTED = android.graphics.Color.parseColor("#F5B7B1"); // 진한 빨강
+    private static final int COLOR_HIGH_UNSELECTED = android.graphics.Color.parseColor("#FADBD8"); // 연한 빨강
+    private static final int COLOR_MID_SELECTED = android.graphics.Color.parseColor("#85C1E9");   // 진한 파랑
+    private static final int COLOR_MID_UNSELECTED = android.graphics.Color.parseColor("#EBF5FB"); // 연한 파랑
+    private static final int COLOR_LOW_SELECTED = android.graphics.Color.parseColor("#82E0AA");   // 진한 초록
+    private static final int COLOR_LOW_UNSELECTED = android.graphics.Color.parseColor("#EAFAF1"); // 연한 초록
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,16 +118,19 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
 
         btnLevelHigh.setOnClickListener(v -> {
             selectedLevel = "ADVANCED";
+            updateLevelButtonsUI();
             Toast.makeText(this, "상급 코스로 선택되었습니다.", Toast.LENGTH_SHORT).show();
         });
 
         btnLevelMid.setOnClickListener(v -> {
             selectedLevel = "INTERMEDIATE";
+            updateLevelButtonsUI();
             Toast.makeText(this, "중급 코스로 선택되었습니다.", Toast.LENGTH_SHORT).show();
         });
 
         btnLevelLow.setOnClickListener(v -> {
             selectedLevel = "BEGINNER";
+            updateLevelButtonsUI();
             Toast.makeText(this, "하급 코스로 선택되었습니다.", Toast.LENGTH_SHORT).show();
         });
 
@@ -198,6 +209,7 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
                         // 3. 난이도 세팅 (getLevelTagName() → getLevelType()으로 변경)
                         if (data.getLevelType() != null) {
                             selectedLevel = data.getLevelType();
+                            updateLevelButtonsUI();
                         }
 
                         // 4. 포인트 좌표들을 이용해 지도 선 세팅
@@ -226,6 +238,16 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
                 Log.e(TAG, "상세 정보 네트워크 오류", t);
             }
         });
+    }
+
+    // 선택 상태를 화면에 반영하는 함수
+    private void updateLevelButtonsUI() {
+        btnLevelHigh.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                "ADVANCED".equals(selectedLevel) ? COLOR_HIGH_SELECTED : COLOR_HIGH_UNSELECTED));
+        btnLevelMid.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                "INTERMEDIATE".equals(selectedLevel) ? COLOR_MID_SELECTED : COLOR_MID_UNSELECTED));
+        btnLevelLow.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                "BEGINNER".equals(selectedLevel) ? COLOR_LOW_SELECTED : COLOR_LOW_UNSELECTED));
     }
 
     private void drawCourseLine() {
