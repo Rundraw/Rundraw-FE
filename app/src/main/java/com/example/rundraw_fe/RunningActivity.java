@@ -64,6 +64,13 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
 
     private boolean isPaused = false;
 
+
+    // 시작점을 맞추기 위한 변수들
+    private static final float START_POINT_THRESHOLD_M = 20f; // ★ 시작점으로 인정할 거리(20m 이내)
+    private boolean hasStartedRecording = false; // ★ 진짜 기록이 시작됐는지 여부
+    private TextView tvStartGuide; // ★ "시작점으로 이동하세요" 안내 문구
+    private TextView tvNavigationBanner; // ★ 화면에 좌/우회전 안내 띄우는 문구
+
     // 타이머 및 시간 계산을 위한 변수들
     private long startTimeMillis = 0L;
     private long pausedDurationMillis = 0L;
@@ -154,8 +161,13 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         // ★ GPS 실시간 추적 콜백 정의 (3초 간격 위치 수신)
         setupLocationCallback();
 
-        // 러닝 화면 진입 시 코스 기록 시작 API 호출
-        startCourseRecord(courseDraftId);
+        // 러닝 화면 진입 시 코스 기록 시작 API 호출 -> 바로 시작은 삭제
+        // startCourseRecord(courseDraftId);
+        tvStartGuide = findViewById(R.id.tvStartGuide);       // ★ activity_running.xml에 추가 필요
+        tvNavigationBanner = findViewById(R.id.tvNavigationBanner); // ★ activity_running.xml에 추가 필요
+
+        setupLocationCallback();
+        startLocationUpdates(); // ★ 기록은 아직 시작 안 하고, GPS 추적만 먼저 켜기
     }
 
     private void loadCourseDraft(Long draftId) {
@@ -222,6 +234,12 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                         currentLng = location.getLongitude();
                         isRealLocationReceived = true;
 
+                        // 아직 기록을 시작 안 했다면 → "시작점에 도착했는지"만 검사
+                        if (!hasStartedRecording) {
+                            checkIfNearStartPoint(currentLat, currentLng);
+                            return; // 시작 전에는 경로 그리기, 서버 전송, 안내 다 스킵
+                        }
+
                         LatLng newPoint = new LatLng(currentLat, currentLng);
                         userPathPoints.add(newPoint);
 
@@ -246,6 +264,34 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
         };
     }
 
+    // 시작점 검사 메서드 : "지금 위치 vs 그린 코스의 첫 좌표" 사이 거리를 재는 함수
+    private void checkIfNearStartPoint(double lat, double lng) {
+        if (draftCoursePoints.isEmpty()) {
+            if (tvStartGuide != null) tvStartGuide.setText("코스 정보를 불러오는 중...");
+            return;
+        }
+
+        LatLng startPoint = draftCoursePoints.get(0);
+        float[] result = new float[1];
+        Location.distanceBetween(lat, lng, startPoint.latitude, startPoint.longitude, result);
+        float distanceToStart = result[0]; // 미터 단위
+
+        if (distanceToStart <= START_POINT_THRESHOLD_M) {
+            // ★ 도착! 이제 진짜 기록 시작
+            hasStartedRecording = true;
+            if (tvStartGuide != null) tvStartGuide.setVisibility(View.GONE);
+            Log.d(TAG, "✅ 시작점 도착 확인 (거리: " + distanceToStart + "m). 기록을 시작합니다.");
+            startCourseRecord(courseDraftId); // ★ 여기서 진짜로 기록/타이머 시작
+        } else {
+            // ★ 아직 멀었으면 안내 문구만 계속 갱신
+            if (tvStartGuide != null) {
+                tvStartGuide.setVisibility(View.VISIBLE);
+                tvStartGuide.setText(String.format(Locale.getDefault(),
+                        "시작점으로 이동해주세요 (약 %.0fm 남음)", distanceToStart));
+            }
+        }
+    }
+
     private void checkNavigationTriggers(double lat, double lng) {
         for (int i = 0; i < instructions.size(); i++) {
             if (instructionPlayed.get(i)) continue;
@@ -259,6 +305,8 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
                 tts.speak(instruction.getText(), android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, null);
                 instructionPlayed.set(i, true);
                 Log.d(TAG, "음성 안내 재생: " + instruction.getText());
+
+                showNavigationBanner(instruction.getText());
             }
         }
     }
@@ -294,6 +342,18 @@ public class RunningActivity extends AppCompatActivity implements OnMapReadyCall
             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
             Log.d(TAG, "📡 실시간 GPS 추적 시작됨");
         }
+    }
+
+    // 화면에 안내 문구를 잠시 보이기
+    private void showNavigationBanner(String text) {
+        if (tvNavigationBanner == null) return;
+        tvNavigationBanner.setText(text);
+        tvNavigationBanner.setVisibility(View.VISIBLE);
+
+        // 3초 뒤 자동으로 숨기기
+        timerHandler.postDelayed(() -> {
+            if (tvNavigationBanner != null) tvNavigationBanner.setVisibility(View.GONE);
+        }, 3000);
     }
 
     // [API 1] 코스 기록 시작 (POST /api/user/me/course/record)
