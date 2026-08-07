@@ -22,7 +22,6 @@ import com.example.rundraw_fe.request.CourseSettingReqDTO;
 import com.example.rundraw_fe.response.ApiResponse;
 import com.example.rundraw_fe.response.CourseDetailResponse;
 
-// 구글 맵 관련 임포트
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,7 +48,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
     private long courseId = 1L;
     private String selectedLevel = "INTERMEDIATE";
 
-    // 지도 관련 변수
     private GoogleMap mMap;
     private boolean isMapReady = false;
     private final List<LatLng> coursePoints = new ArrayList<>();
@@ -61,11 +59,9 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
 
         setContentView(R.layout.activity_course_setting);
 
-        // 1. 이전 화면에서 courseId 받기
         courseId = getIntent().getLongExtra("courseId", 1L);
         Log.d(TAG, "전달받은 courseId = " + courseId);
 
-        // 2. 뷰 초기화
         etSettingCourseName = findViewById(R.id.etSettingCourseName);
         etSettingCourseDesc = findViewById(R.id.etSettingCourseDesc);
         etRestaurantSearch = findViewById(R.id.etRestaurantSearch);
@@ -81,11 +77,9 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
         btnAddRestaurant = findViewById(R.id.btnAddRestaurant);
         btnRemoveRestaurant = findViewById(R.id.btnRemoveRestaurant);
 
-        // 3. 처음에는 수정 못 하도록 EditText 잠그기 (읽기 전용 상태)
         setEditable(etSettingCourseName, false);
         setEditable(etSettingCourseDesc, false);
 
-        // '코스 이름' 수정/완료 토글 버튼 클릭 시
         tvEditName.setOnClickListener(v -> {
             if (etSettingCourseName.isEnabled()) {
                 setEditable(etSettingCourseName, false);
@@ -96,7 +90,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
-        // '코스 설명' 수정/완료 토글 버튼 클릭 시
         tvEditDesc.setOnClickListener(v -> {
             if (etSettingCourseDesc.isEnabled()) {
                 setEditable(etSettingCourseDesc, false);
@@ -107,17 +100,14 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             }
         });
 
-        // 4. 지도 프래그먼트 연동
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
-        // 5. 서버에서 기존 코스 정보(이름, 설명, 포인트 좌표) 불러오기
         loadExistingCourseData();
 
-        // 난이도 버튼 클릭 이벤트
         btnLevelHigh.setOnClickListener(v -> {
             selectedLevel = "ADVANCED";
             Toast.makeText(this, "상급 코스로 선택되었습니다.", Toast.LENGTH_SHORT).show();
@@ -133,7 +123,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             Toast.makeText(this, "하급 코스로 선택되었습니다.", Toast.LENGTH_SHORT).show();
         });
 
-        // 경로 수정 및 저장하기 버튼
         btnSaveCourse.setOnClickListener(v -> {
             String title = etSettingCourseName.getText().toString().trim();
             String description = etSettingCourseDesc.getText().toString().trim();
@@ -164,7 +153,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
             });
         });
 
-        // 삭제하기 버튼
         btnDeleteCourse.setOnClickListener(v -> {
             Toast.makeText(this, "코스가 삭제되었습니다.", Toast.LENGTH_SHORT).show();
             finish();
@@ -179,7 +167,8 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
     }
 
     /**
-     * 서버에서 기존 코스 정보를 RankingApi와 제공된 CourseDetailResponse 구조에 맞게 불러와서 셋팅
+     * 서버에서 기존 코스 정보를 불러와서 셋팅
+     * (최신 CourseDetailResponse 구조: getContent(), getLevelType() 사용)
      */
     private void loadExistingCourseData() {
         Log.d(TAG, "loadExistingCourseData() 호출됨, courseId = " + courseId);
@@ -196,30 +185,22 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
                     CourseDetailResponse data = response.body().getResult();
 
                     if (data != null) {
-                        Log.d("DEBUG_COURSE", "받아온 이름: " + data.getName());
-                        Log.d("DEBUG_COURSE", "받아온 description: " + data.getContent());
-                        Log.d("DEBUG_COURSE", "받아온 levelTagName: " + data.getLevelType());
-
-                        // 1. 기존 코스 이름 셋팅
+                        // 1. 코스 이름 세팅
                         if (data.getName() != null) {
                             etSettingCourseName.setText(data.getName());
                         }
 
-                        // 2. 기존 설명 셋팅 (서버 응답 데이터 반영)
+                        // 2. 코스 설명 세팅 (getDescription() → getContent()로 변경)
                         if (data.getContent() != null && !data.getContent().isEmpty()) {
                             etSettingCourseDesc.setText(data.getContent());
-                        } else if (data.getContent() != null && !data.getContent().isEmpty()) {
-                            etSettingCourseDesc.setText(data.getContent());
                         }
 
-                        // 3. 기존 난이도 셋팅
+                        // 3. 난이도 세팅 (getLevelTagName() → getLevelType()으로 변경)
                         if (data.getLevelType() != null) {
                             selectedLevel = data.getLevelType();
-                        } else if (data.getLevelType() != null) {
-                            selectedLevel = data.getLevelType();
                         }
 
-                        // 4. 포인트 좌표들을 이용해 지도 선 세팅 (CourseDetailResponse.Point 활용)
+                        // 4. 포인트 좌표들을 이용해 지도 선 세팅
                         List<CourseDetailResponse.Point> points = data.getPoints();
                         if (points != null && !points.isEmpty()) {
                             coursePoints.clear();
@@ -247,9 +228,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
         });
     }
 
-    /**
-     * 지도에 코스 경로 선(Polyline)을 그려주는 함수
-     */
     private void drawCourseLine() {
         if (mMap == null || coursePoints.isEmpty()) return;
 
@@ -278,9 +256,6 @@ public class CourseSettingActivity extends AppCompatActivity implements OnMapRea
         }
     }
 
-    /**
-     * EditText 활성화/비활성화 및 키보드 제어 함수
-     */
     private void setEditable(EditText editText, boolean enabled) {
         editText.setEnabled(enabled);
         editText.setFocusable(enabled);

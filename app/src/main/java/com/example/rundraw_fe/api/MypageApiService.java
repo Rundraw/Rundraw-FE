@@ -2,6 +2,7 @@ package com.example.rundraw_fe.api;
 
 import com.example.rundraw_fe.request.CourseSettingReqDTO;
 import com.example.rundraw_fe.response.ApiResponse;
+import com.example.rundraw_fe.response.CourseDetailResponse; // 💡 임포트 추가 완료
 import com.example.rundraw_fe.response.CourseRecordListResponse;
 import com.example.rundraw_fe.response.DraftCourseListResponse;
 import com.example.rundraw_fe.response.DraftCourseResponse;
@@ -43,4 +44,8 @@ public interface MypageApiService {
 
     @GET("api/course/draft/{courseDraftId}")
     Call<ApiResponse<DraftCourseResponse>> getDraftCourseDetail(@Path("courseDraftId") Long courseDraftId);
+
+    // 💡 코스 상세 조회 API 연동 (URL, GET, Path 추가 완료)
+    @GET("api/course/{courseId}")
+    Call<ApiResponse<CourseDetailResponse>> getCourseDetail(@Path("courseId") long courseId);
 }
