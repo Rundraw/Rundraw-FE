@@ -42,17 +42,21 @@ public class MyPageDrawnActivity extends BaseActivity {
         rvCourses.setLayoutManager(new LinearLayoutManager(this));
         rvCourses.setAdapter(adapter);
 
-        // 어댑터 아이템 클릭 시 상세 화면(CourseDetailActivity)으로 이동
-        // 완주 시 CourseDraft -> Course로 자동 승격되므로, 승격된 courseId로 이동해야 함
         adapter.setOnItemClickListener((position, courseName) -> {
             DraftCourseResponse draft = courseList.get(position);
-            if (draft.getCourseId() == null) {
-                Toast.makeText(this, "완주 전 코스는 상세 화면이 없습니다. 완주 후 이용해주세요.", Toast.LENGTH_SHORT).show();
-                return;
+
+            if (draft.getCourseId() != null) {
+                // 완주 완료 → 정식 코스 상세 화면
+                Intent intent = new Intent(MyPageDrawnActivity.this, CourseDetailActivity.class);
+                intent.putExtra("courseId", draft.getCourseId());
+                startActivity(intent);
+            } else {
+                // 완주 전 (그린 코스) → Draft 코스 상세 화면
+                Intent intent = new Intent(MyPageDrawnActivity.this, MyPageCourseDetailActivity.class);
+                intent.putExtra("courseId", draft.getDraftCourseId()); // MyPageCourseDetailActivity가 받는 키 이름이 "courseId"라 그대로 유지
+                intent.putExtra("courseName", courseName);
+                startActivity(intent);
             }
-            Intent intent = new Intent(MyPageDrawnActivity.this, CourseDetailActivity.class);
-            intent.putExtra("courseId", draft.getCourseId());
-            startActivity(intent);
         });
 
         // 공유 아이콘 클릭 시 공유 상태 토글
